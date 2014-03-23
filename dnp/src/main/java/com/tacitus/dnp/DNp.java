@@ -1,20 +1,27 @@
 package com.tacitus.dnp;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.Switch;
+import android.widget.ToggleButton;
 
 import com.tacitus.dnp.widget.DrawingView;
 
 public class Dnp extends Activity implements View.OnClickListener {
 
     private DrawingView mDrawView;
-    private ImageButton mCurrPaint;
     private ImageButton mDrawBtn;
+    private ImageButton mNewBtn;
     private float mSmallBrush;
     private float mMediumBrush;
     private float mLargeBrush;
@@ -25,32 +32,33 @@ public class Dnp extends Activity implements View.OnClickListener {
         setContentView(R.layout.activity_dnp);
         mDrawView = (DrawingView)findViewById(R.id.drawing);
 
-        LinearLayout paintLayout = (LinearLayout)findViewById(R.id.paint_colors);
-        mCurrPaint = (ImageButton)paintLayout.getChildAt(0);
-        mCurrPaint.setImageDrawable(getResources().getDrawable(R.drawable.paint_pressed));
-
         mSmallBrush = getResources().getInteger(R.integer.small_size);
         mMediumBrush = getResources().getInteger(R.integer.medium_size);
         mLargeBrush = getResources().getInteger(R.integer.large_size);
 
         mDrawBtn = (ImageButton)findViewById(R.id.draw_btn);
+        mNewBtn = (ImageButton)findViewById(R.id.new_btn);
 
         mDrawBtn.setOnClickListener(this);
+        mNewBtn.setOnClickListener(this);
 
         mDrawView.setBrushSize(mLargeBrush);
     }
 
-    public void paintClicked(View view){
-        //use chosen color
-        if (view != mCurrPaint) {
-            //update color
-            ImageButton imgView = (ImageButton)view;
-            String color = view.getTag().toString();
-            mDrawView.setColor(color);
-            imgView.setImageDrawable(getResources().getDrawable(R.drawable.paint_pressed));
-            mCurrPaint.setImageDrawable(getResources().getDrawable(R.drawable.paint));
-            mCurrPaint =(ImageButton)view;
+    public void paintClickedToggle(View view) {
+        String color = view.getTag().toString();
+        mDrawView.setColor(color);
+    }
+
+
+    public void hollowClicked(View view) {
+        boolean on = ((Switch) view).isChecked();
+        if (on) {
+            mDrawView.setHollowMode(true);
+        } else {
+            mDrawView.setHollowMode(false);
         }
+
     }
 
     @Override
@@ -98,21 +106,38 @@ public class Dnp extends Activity implements View.OnClickListener {
             brushDialog.show();
 
 
+        } else if(view.getId()==R.id.new_btn){
+            //new button
+            AlertDialog.Builder newDialog = new AlertDialog.Builder(this);
+            newDialog.setTitle("New drawing");
+            newDialog.setMessage("Start new drawing (you will lose the current drawing)?");
+            newDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener(){
+                public void onClick(DialogInterface dialog, int which){
+                    mDrawView.startNew();
+                    dialog.dismiss();
+                }
+            });
+            newDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener(){
+                public void onClick(DialogInterface dialog, int which){
+                    dialog.cancel();
+                }
+            });
+            newDialog.show();
         }
     }
 
-    @Override
-    protected void onSaveInstanceState(android.os.Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putInt("PAINT_BUTTON", mCurrPaint.getId());
-
-
-    }
-
-    @Override
-    protected void onRestoreInstanceState(final android.os.Bundle savedInstanceState) {
-        paintClicked(findViewById(savedInstanceState.getInt("PAINT_BUTTON")));
-        super.onRestoreInstanceState(savedInstanceState);
-    }
+//    @Override
+//    protected void onSaveInstanceState(android.os.Bundle outState) {
+//        super.onSaveInstanceState(outState);
+//        outState.putInt("PAINT_BUTTON", mCurrPaint.getId());
+//
+//
+//    }
+//
+//    @Override
+//    protected void onRestoreInstanceState(final android.os.Bundle savedInstanceState) {
+//        paintClicked(findViewById(savedInstanceState.getInt("PAINT_BUTTON")));
+//        super.onRestoreInstanceState(savedInstanceState);
+//    }
 
 }
