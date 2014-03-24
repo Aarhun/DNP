@@ -104,7 +104,7 @@ public class DrawingView extends View {
 
         mCanvasPaint = new Paint(Paint.DITHER_FLAG);
 
-        mBrushSize = getResources().getInteger(R.integer.medium_size);
+        setBrushSize(getResources().getDimension(R.dimen.initial_size));
 
         mDrawPaint.setStrokeWidth(mBrushSize);
         mDrawPaintHollow.setStrokeWidth(mBrushSize-(int)(mBrushSize*mHollowLineThickness/100));

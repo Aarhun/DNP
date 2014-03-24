@@ -6,13 +6,18 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
+import android.widget.SeekBar;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.tacitus.dnp.widget.DrawingView;
@@ -20,11 +25,9 @@ import com.tacitus.dnp.widget.DrawingView;
 public class Dnp extends Activity implements View.OnClickListener {
 
     private DrawingView mDrawView;
-    private ImageButton mDrawBtn;
     private ImageButton mNewBtn;
-    private float mSmallBrush;
-    private float mMediumBrush;
-    private float mLargeBrush;
+    private SeekBar mBrushSizeChooser;
+    private TextView mBrushSizeChooserText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,17 +35,40 @@ public class Dnp extends Activity implements View.OnClickListener {
         setContentView(R.layout.activity_dnp);
         mDrawView = (DrawingView)findViewById(R.id.drawing);
 
-        mSmallBrush = getResources().getInteger(R.integer.small_size);
-        mMediumBrush = getResources().getInteger(R.integer.medium_size);
-        mLargeBrush = getResources().getInteger(R.integer.large_size);
-
-        mDrawBtn = (ImageButton)findViewById(R.id.draw_btn);
         mNewBtn = (ImageButton)findViewById(R.id.new_btn);
 
-        mDrawBtn.setOnClickListener(this);
         mNewBtn.setOnClickListener(this);
 
-        mDrawView.setBrushSize(mLargeBrush);
+        mBrushSizeChooserText = (TextView)findViewById(R.id.brush_size_chooser_text);
+        mBrushSizeChooser = (SeekBar)findViewById(R.id.brush_size_chooser);
+        mBrushSizeChooser.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                mDrawView.setBrushSize(progress);
+                mBrushSizeChooserText.setText(getResources().getText(R.string.brush_size) + " " + progress);
+//                ViewGroup.LayoutParams layoutParams = mColorChooser.getLayoutParams();
+//                if (layoutParams != null) {
+//                    float size = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+//                            progress, getResources().getDisplayMetrics());
+//                    layoutParams.height = (int) size;
+//                    layoutParams.width = (int) size;
+//                    mColorChooser.setLayoutParams(layoutParams);
+//                }
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+        mBrushSizeChooser.setProgress((int) getResources().getDimension(R.dimen.initial_size));
+
     }
 
     public void paintClickedToggle(View view) {
@@ -63,50 +89,7 @@ public class Dnp extends Activity implements View.OnClickListener {
 
     @Override
     public void onClick(View view){
-    //respond to clicks
-        if(view.getId()==R.id.draw_btn){
-            //draw button clicked
-            final Dialog brushDialog = new Dialog(this);
-            brushDialog.setTitle("Brush size:");
-            brushDialog.setContentView(R.layout.brush_chooser);
-
-            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, getResources().getDimensionPixelOffset(R.dimen.large_brush) * 2);
-            layoutParams.weight = 1;
-            ImageButton smallBtn = (ImageButton)brushDialog.findViewById(R.id.small_brush);
-            smallBtn.setLayoutParams(layoutParams);
-
-            smallBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mDrawView.setBrushSize(mSmallBrush);
-                    brushDialog.dismiss();
-                }
-            });
-
-            ImageButton mediumBtn = (ImageButton)brushDialog.findViewById(R.id.medium_brush);
-            mediumBtn.setLayoutParams(layoutParams);
-            mediumBtn.setOnClickListener(new View.OnClickListener(){
-                @Override
-                public void onClick(View v) {
-                    mDrawView.setBrushSize(mMediumBrush);
-                    brushDialog.dismiss();
-                }
-            });
-
-            ImageButton largeBtn = (ImageButton)brushDialog.findViewById(R.id.large_brush);
-            largeBtn.setLayoutParams(layoutParams);
-            largeBtn.setOnClickListener(new View.OnClickListener(){
-                @Override
-                public void onClick(View v) {
-                    mDrawView.setBrushSize(mLargeBrush);
-                    brushDialog.dismiss();
-                }
-            });
-
-            brushDialog.show();
-
-
-        } else if(view.getId()==R.id.new_btn){
+        if(view.getId()==R.id.new_btn){
             //new button
             AlertDialog.Builder newDialog = new AlertDialog.Builder(this);
             newDialog.setTitle("New drawing");
