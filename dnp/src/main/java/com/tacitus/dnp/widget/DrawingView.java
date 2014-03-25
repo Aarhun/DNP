@@ -25,12 +25,14 @@ import java.util.Map;
 
 public class DrawingView extends View {
 
-    //drawing path
+    //drawing path & paint
     private Map<Integer, Path> mDrawPaths = new HashMap<Integer, Path>();
+    private Map<Integer, Paint> mDrawPaints = new HashMap<Integer, Paint>();
+    private Map<Integer, Paint> mDrawPaintsHollow = new HashMap<Integer, Paint>();
 
-    //drawing and canvas paint
-    private Paint mDrawPaint;
-    private Paint mDrawPaintHollow;
+    private final float MAJOR_TOUCH_RATIO = 1.5f;
+    private final int HOLLOW_LINE_THICKNESS_RATIO = 20;
+
     private Paint mCanvasPaint;
     //initial color
     private int mPaintColor = 0xFF660000;
@@ -38,9 +40,10 @@ public class DrawingView extends View {
     private Canvas mDrawCanvas;
 //    private ArrayList<EventHolder> mEventList = new ArrayList<EventHolder>();
 
-    private static int mHollowLineThickness = 20;
+    
 
     private boolean mHollowMode = false;
+    private boolean mTouchSizeMode = true;
 
 
     //canvas bitmap
@@ -80,37 +83,40 @@ public class DrawingView extends View {
 
     public DrawingView(Context context, AttributeSet attrs){
         super(context, attrs);
-        setupDrawing();
-    }
-
-    private void setupDrawing(){
-    //    get drawing area setup for interaction
-
-        mDrawPaint = new Paint();
-        mDrawPaintHollow = new Paint();
-
-        mDrawPaint.setColor(mPaintColor);
-
-        mDrawPaint.setAntiAlias(true);
-        mDrawPaint.setStyle(Paint.Style.STROKE);
-        mDrawPaint.setStrokeJoin(Paint.Join.ROUND);
-        mDrawPaint.setStrokeCap(Paint.Cap.ROUND);
-
-        mDrawPaintHollow.setAntiAlias(true);
-        mDrawPaintHollow.setStyle(Paint.Style.STROKE);
-        mDrawPaintHollow.setStrokeJoin(Paint.Join.ROUND);
-        mDrawPaintHollow.setStrokeCap(Paint.Cap.ROUND);
-        mDrawPaintHollow.setColor(((ColorDrawable)findViewById(R.id.drawing).getBackground()).getColor());
-//        mDrawPaintHollow.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-
         mCanvasPaint = new Paint(Paint.DITHER_FLAG);
-
         setBrushSize(getResources().getDimension(R.dimen.initial_size));
-
-        mDrawPaint.setStrokeWidth(mBrushSize);
-        mDrawPaintHollow.setStrokeWidth(mBrushSize-(int)(mBrushSize*mHollowLineThickness/100));
     }
 
+    private Paint createPaint(float size, boolean isHollow) {
+        Paint paint = new Paint();
+        paint.setAntiAlias(true);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeJoin(Paint.Join.ROUND);
+        paint.setStrokeCap(Paint.Cap.ROUND);
+        setPaintColor(paint, isHollow);
+
+        //update size
+        setBrushSize(paint, size);
+        return paint;
+    }
+
+    private void setBrushSize(Paint paint, float size) {
+        Resources resources = getResources();
+        Assert.assertNotNull(resources);
+        paint.setStrokeWidth(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                size, resources.getDisplayMetrics()));
+
+    }
+
+    private void setPaintColor(Paint paint, boolean isHollow) {
+        if (isHollow) {
+            ColorDrawable colorDrawable = (ColorDrawable)findViewById(R.id.drawing).getBackground();
+            Assert.assertNotNull(colorDrawable);
+            paint.setColor(colorDrawable.getColor());
+        } else {
+            paint.setColor(mPaintColor);
+        }
+    }
 
 
     @Override
@@ -136,8 +142,10 @@ public class DrawingView extends View {
         int index = MotionEventCompat.getActionIndex(event);
         // Id of multiple touch event
         int id = MotionEventCompat.getPointerId(event, index);
-
-
+        float size = mBrushSize;
+        if (mTouchSizeMode) {
+            size = event.getTouchMajor(index);
+        }
 
         switch (MotionEventCompat.getActionMasked(event)) {
             case MotionEvent.ACTION_POINTER_DOWN:
@@ -146,12 +154,16 @@ public class DrawingView extends View {
                 Path path = new Path();
                 path.moveTo(touchX, touchY);
                 path.lineTo(touchX - 1, touchY - 1);
-                mDrawCanvas.drawPath(path, mDrawPaint);
+                Paint paint = createPaint(size / MAJOR_TOUCH_RATIO, false);
+                Paint paintHollow = createPaint((size / MAJOR_TOUCH_RATIO) - ((size / MAJOR_TOUCH_RATIO) * HOLLOW_LINE_THICKNESS_RATIO / 100), true);
+                mDrawCanvas.drawPath(path, paint);
                 if (mHollowMode) {
-                    mDrawCanvas.drawPath(path, mDrawPaintHollow);
+                    mDrawCanvas.drawPath(path, paintHollow);
                 }
                 invalidate();
                 mDrawPaths.put(id, path);
+                mDrawPaints.put(id, paint);
+                mDrawPaintsHollow.put(id, paintHollow);
                 break;
 
             case MotionEvent.ACTION_MOVE:
@@ -159,13 +171,15 @@ public class DrawingView extends View {
                 for (int i = 0; i < MotionEventCompat.getPointerCount(event); i++) {
                     int currentId = MotionEventCompat.getPointerId(event, i);
                     path = mDrawPaths.get(currentId);
+                    paint = mDrawPaints.get(currentId);
+                    paintHollow = mDrawPaintsHollow.get(currentId);
                     if (path != null) {
                         touchX = MotionEventCompat.getX(event, i);
                         touchY = MotionEventCompat.getY(event, i);
                         path.lineTo(touchX, touchY);
-                        mDrawCanvas.drawPath(path, mDrawPaint);
+                        mDrawCanvas.drawPath(path, paint);
                         if (mHollowMode) {
-                            mDrawCanvas.drawPath(path, mDrawPaintHollow);
+                            mDrawCanvas.drawPath(path, paintHollow);
                         }
                         invalidate();
                     }
@@ -176,7 +190,12 @@ public class DrawingView extends View {
             case MotionEvent.ACTION_POINTER_UP:
             case MotionEvent.ACTION_UP:
                 // Delete path:
-                mDrawPaths.remove(id);
+                path = mDrawPaths.remove(id);
+                path.close();
+                // Delete paint:
+                mDrawPaints.remove(id);
+                // Delete paint hollow:
+                mDrawPaintsHollow.remove(id);
                 break;
 
             default:
@@ -191,7 +210,6 @@ public class DrawingView extends View {
         //set color
         invalidate();
         mPaintColor = Color.parseColor(newColor);
-        mDrawPaint.setColor(mPaintColor);
     }
 
     public void setBrushSize(float newSize){
@@ -200,12 +218,14 @@ public class DrawingView extends View {
         Assert.assertNotNull(resources);
         mBrushSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 newSize, resources.getDisplayMetrics());
-        mDrawPaint.setStrokeWidth(mBrushSize);
-        mDrawPaintHollow.setStrokeWidth(mBrushSize-(int)(mBrushSize*mHollowLineThickness/100));
     }
 
     public void setHollowMode(boolean hollowMode) {
         mHollowMode = hollowMode;
+    }
+
+    public void setTouchSizeMode(boolean touchSizeMode) {
+        mTouchSizeMode = touchSizeMode;
     }
 
     public void startNew(){
@@ -244,7 +264,7 @@ public class DrawingView extends View {
 //                    mDrawPaint.setColor(mPaintColor);
 //                    mBrushSize = bundle.getFloat("BRUSH_SIZE");
 //                    mDrawPaint.setStrokeWidth(mBrushSize);
-//                    mDrawPaintHollow.setStrokeWidth(mBrushSize-((int)(mBrushSize)*mHollowLineThickness/100));
+//                    mDrawPaintHollow.setStrokeWidth(mBrushSize-((int)(mBrushSize)*HOLLOW_LINE_THICKNESS_RATIO/100));
 //                }
 //            });
 //

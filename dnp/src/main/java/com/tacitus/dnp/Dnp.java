@@ -2,23 +2,13 @@ package com.tacitus.dnp;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
-import android.util.TypedValue;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
-import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.ToggleButton;
 
 import com.tacitus.dnp.widget.DrawingView;
 
@@ -28,6 +18,7 @@ public class Dnp extends Activity implements View.OnClickListener {
     private ImageButton mNewBtn;
     private SeekBar mBrushSizeChooser;
     private TextView mBrushSizeChooserText;
+    private TextView mBrushSizeChooserTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,21 +31,16 @@ public class Dnp extends Activity implements View.OnClickListener {
         mNewBtn.setOnClickListener(this);
 
         mBrushSizeChooserText = (TextView)findViewById(R.id.brush_size_chooser_text);
+        mBrushSizeChooserTitle = (TextView)findViewById(R.id.brush_size_chooser_title);
+        mBrushSizeChooserText.setTextColor(getResources().getColor(android.R.color.darker_gray));
+        mBrushSizeChooserTitle.setTextColor(getResources().getColor(android.R.color.darker_gray));
         mBrushSizeChooser = (SeekBar)findViewById(R.id.brush_size_chooser);
+        mBrushSizeChooser.setEnabled(false);
         mBrushSizeChooser.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                mDrawView.setBrushSize(progress);
-                mBrushSizeChooserText.setText(getResources().getText(R.string.brush_size) + " " + progress);
-//                ViewGroup.LayoutParams layoutParams = mColorChooser.getLayoutParams();
-//                if (layoutParams != null) {
-//                    float size = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-//                            progress, getResources().getDisplayMetrics());
-//                    layoutParams.height = (int) size;
-//                    layoutParams.width = (int) size;
-//                    mColorChooser.setLayoutParams(layoutParams);
-//                }
-
+                mDrawView.setBrushSize(progress * 2);
+                mBrushSizeChooserText.setText(String.valueOf(progress));
             }
 
             @Override
@@ -68,7 +54,6 @@ public class Dnp extends Activity implements View.OnClickListener {
             }
         });
         mBrushSizeChooser.setProgress((int) getResources().getDimension(R.dimen.initial_size));
-
     }
 
     public void paintClickedToggle(View view) {
@@ -85,6 +70,21 @@ public class Dnp extends Activity implements View.OnClickListener {
             mDrawView.setHollowMode(false);
         }
 
+    }
+
+    public void touchSizeModeClicked(View view) {
+        boolean on = ((Switch) view).isChecked();
+        if (on) {
+            mDrawView.setTouchSizeMode(true);
+            mBrushSizeChooser.setEnabled(false);
+            mBrushSizeChooserText.setTextColor(getResources().getColor(android.R.color.darker_gray));
+            mBrushSizeChooserTitle.setTextColor(getResources().getColor(android.R.color.darker_gray));
+        } else {
+            mDrawView.setTouchSizeMode(false);
+            mBrushSizeChooser.setEnabled(true);
+            mBrushSizeChooserText.setTextColor(getResources().getColor(android.R.color.black));
+            mBrushSizeChooserTitle.setTextColor(getResources().getColor(android.R.color.black));
+        }
     }
 
     @Override
