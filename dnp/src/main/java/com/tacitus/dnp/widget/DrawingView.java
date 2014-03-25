@@ -8,8 +8,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
 import android.graphics.drawable.ColorDrawable;
+import android.support.v4.view.MotionEventCompat;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.MotionEvent;
@@ -19,13 +19,15 @@ import com.tacitus.dnp.R;
 
 import junit.framework.Assert;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 public class DrawingView extends View {
 
-
-
     //drawing path
-    private Path mDrawPath;
+    private Map<Integer, Path> mDrawPaths = new HashMap<Integer, Path>();
+
     //drawing and canvas paint
     private Paint mDrawPaint;
     private Paint mDrawPaintHollow;
@@ -84,7 +86,6 @@ public class DrawingView extends View {
     private void setupDrawing(){
     //    get drawing area setup for interaction
 
-        mDrawPath = new Path();
         mDrawPaint = new Paint();
         mDrawPaintHollow = new Paint();
 
@@ -111,6 +112,7 @@ public class DrawingView extends View {
     }
 
 
+
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         //view given size
@@ -123,63 +125,65 @@ public class DrawingView extends View {
     protected void onDraw(Canvas canvas) {
          //draw view
         canvas.drawBitmap(mCanvasBitmap, 0, 0, mCanvasPaint);
-        canvas.drawPath(mDrawPath, mDrawPaint);
-        if (mHollowMode) {
-            canvas.drawPath(mDrawPath, mDrawPaintHollow);
-        }
     }
-
-//    private void onTouchEvent(EventHolder holder) {
-////        Log.e("DEBUG", "Replay event: " + holder.mEventType + " " + holder.mX + "/" + holder.mY + " " + holder.mColor + " " + holder.mBrushSize);
-//        switch (holder.mEventType) {
-//            case MotionEvent.ACTION_DOWN:
-//                invalidate();
-//                mDrawPaint.setColor(holder.mColor);
-//                mDrawPaint.setStrokeWidth(holder.mBrushSize);
-//                mDrawPaintHollow.setStrokeWidth(holder.mBrushSize-(int)(holder.mBrushSize*mHollowLineThickness/100));
-//                mDrawPath.moveTo(holder.mX, holder.mY);
-//                break;
-//            case MotionEvent.ACTION_MOVE:
-//                mDrawPath.lineTo(holder.mX, holder.mY);
-//                break;
-//            case MotionEvent.ACTION_UP:
-//                mDrawCanvas.drawPath(mDrawPath, mDrawPaint);
-//                mDrawCanvas.drawPath(mDrawPath, mDrawPaintHollow);
-//                mDrawPath.reset();
-//                break;
-//            default:
-//                break;
-//        }
-//        invalidate();
-//    }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        //detect user touch
-        float touchX = event.getX();
-        float touchY = event.getY();
+        float touchX = MotionEventCompat.getX(event, MotionEventCompat.getActionIndex(event));
+        float touchY = MotionEventCompat.getY(event, MotionEventCompat.getActionIndex(event));
 
-        switch (event.getAction()) {
+        // Index of multiple touch event:
+        int index = MotionEventCompat.getActionIndex(event);
+        // Id of multiple touch event
+        int id = MotionEventCompat.getPointerId(event, index);
+
+
+
+        switch (MotionEventCompat.getActionMasked(event)) {
+            case MotionEvent.ACTION_POINTER_DOWN:
             case MotionEvent.ACTION_DOWN:
-//                mEventList.add(new EventHolder(event.getAction(), touchX, touchY, mPaintColor, mBrushSize));
-                mDrawPath.moveTo(touchX, touchY);
-                break;
-            case MotionEvent.ACTION_MOVE:
-//                mEventList.add(new EventHolder(event.getAction(), touchX, touchY, mPaintColor, mBrushSize));
-                mDrawPath.lineTo(touchX, touchY);
-                break;
-            case MotionEvent.ACTION_UP:
-//                mEventList.add(new EventHolder(event.getAction(), touchX, touchY, mPaintColor, mBrushSize));
-                mDrawCanvas.drawPath(mDrawPath, mDrawPaint);
-                if(mHollowMode) {
-                    mDrawCanvas.drawPath(mDrawPath, mDrawPaintHollow);
+                // Create path and draw a small line of 1 pixel:
+                Path path = new Path();
+                path.moveTo(touchX, touchY);
+                path.lineTo(touchX - 1, touchY - 1);
+                mDrawCanvas.drawPath(path, mDrawPaint);
+                if (mHollowMode) {
+                    mDrawCanvas.drawPath(path, mDrawPaintHollow);
                 }
-                mDrawPath.reset();
+                invalidate();
+                mDrawPaths.put(id, path);
                 break;
+
+            case MotionEvent.ACTION_MOVE:
+                // In case of ACTION_MOVE event we update all paths:
+                for (int i = 0; i < MotionEventCompat.getPointerCount(event); i++) {
+                    int currentId = MotionEventCompat.getPointerId(event, i);
+                    path = mDrawPaths.get(currentId);
+                    if (path != null) {
+                        touchX = MotionEventCompat.getX(event, i);
+                        touchY = MotionEventCompat.getY(event, i);
+                        path.lineTo(touchX, touchY);
+                        mDrawCanvas.drawPath(path, mDrawPaint);
+                        if (mHollowMode) {
+                            mDrawCanvas.drawPath(path, mDrawPaintHollow);
+                        }
+                        invalidate();
+                    }
+                }
+                break;
+
+            case MotionEvent.ACTION_CANCEL:
+            case MotionEvent.ACTION_POINTER_UP:
+            case MotionEvent.ACTION_UP:
+                // Delete path:
+                mDrawPaths.remove(id);
+                break;
+
             default:
+                // Do not consume other events.
                 return false;
         }
-        invalidate();
+        // Consume handled event.
         return true;
     }
 
