@@ -38,10 +38,6 @@ public class DrawingView extends View {
     private int mPaintColor = 0xFF660000;
     //canvas
     private Canvas mDrawCanvas;
-//    private ArrayList<EventHolder> mEventList = new ArrayList<EventHolder>();
-
-    
-
     private boolean mHollowMode = false;
     private boolean mTouchSizeMode = true;
     private boolean mEraseMode = false;
@@ -51,36 +47,6 @@ public class DrawingView extends View {
     private Bitmap mCanvasBitmap;
 
     private float mBrushSize;
-
-//    private static class EventHolder implements Parcelable {
-//        int mEventType;
-//        float mX;
-//        float mY;
-//        int mColor;
-//        float mBrushSize;
-//
-//        public EventHolder(int event, float x, float y, int color, float brushSize) {
-//            this.mEventType = event;
-//            this.mX = x;
-//            this.mY = y;
-//            this.mColor = color;
-//            this.mBrushSize = brushSize;
-////            Log.e("ERROR", "Save event: " + event + " " + x + "/" + y + " " + color + " " + brushSize);
-//
-//        }
-//        public int describeContents() {
-//            return 0;
-//        }
-//
-//        public void writeToParcel(Parcel out, int flags) {
-//            out.writeInt(mEventType);
-//            out.writeFloat(mX);
-//            out.writeFloat(mY);
-//            out.writeInt(mColor);
-//            out.writeFloat(mBrushSize);
-//        }
-//
-//    }
 
     public DrawingView(Context context, AttributeSet attrs){
         super(context, attrs);
@@ -233,44 +199,4 @@ public class DrawingView extends View {
         mDrawCanvas.drawColor(0, PorterDuff.Mode.CLEAR);
         invalidate();
     }
-
-//    @Override
-//    public Parcelable onSaveInstanceState()
-//    {
-//        Bundle bundle = new Bundle();
-//        bundle.putParcelable("INSTANCE_STATE", super.onSaveInstanceState());
-//        bundle.putParcelableArrayList("EVENT_LIST", mEventList);
-//        bundle.putInt("PAINT_COLOR", mPaintColor);
-//        bundle.putFloat("BRUSH_SIZE", mBrushSize);
-//
-//        return bundle;
-//    }
-//
-//    @Override
-//    public void onRestoreInstanceState(Parcelable state)
-//    {
-//        if (state instanceof Bundle)
-//        {
-//            final Bundle bundle = (Bundle) state;
-//            super.onRestoreInstanceState(bundle.getParcelable("INSTANCE_STATE"));
-//            mEventList = bundle.getParcelableArrayList("EVENT_LIST");
-//            post(new Runnable() {
-//                @Override
-//                public void run() {
-//                    // Replay drawing when changing orientation
-//                    for (EventHolder holder : mEventList) {
-//                        onTouchEvent(holder);
-//                    }
-//                    mPaintColor = bundle.getInt("PAINT_COLOR");
-//                    mDrawPaint.setColor(mPaintColor);
-//                    mBrushSize = bundle.getFloat("BRUSH_SIZE");
-//                    mDrawPaint.setStrokeWidth(mBrushSize);
-//                    mDrawPaintHollow.setStrokeWidth(mBrushSize-((int)(mBrushSize)*HOLLOW_LINE_THICKNESS_RATIO/100));
-//                }
-//            });
-//
-//            return;
-//        }
-//        super.onRestoreInstanceState(state);
-//    }
 }

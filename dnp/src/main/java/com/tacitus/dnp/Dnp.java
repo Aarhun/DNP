@@ -1,12 +1,21 @@
 package com.tacitus.dnp;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.widget.DrawerLayout;
+import android.util.DisplayMetrics;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -14,28 +23,71 @@ import android.widget.Toast;
 
 import com.tacitus.dnp.widget.DrawingView;
 
+import junit.framework.Assert;
+
 import java.util.UUID;
 
 public class Dnp extends Activity implements View.OnClickListener {
 
     private DrawingView mDrawView;
-    private ImageButton mNewBtn;
-    private ImageButton mSaveBtn;
     private SeekBar mBrushSizeChooser;
     private TextView mBrushSizeChooserText;
     private TextView mBrushSizeChooserTitle;
+    private ActionBarDrawerToggle mDrawerToggle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dnp);
+
+        // Used to set height of color chooser dynamically
+        RadioGroup radioGroupColor = (RadioGroup) findViewById(R.id.toggleGroup);
+        RelativeLayout colorChooser = (RelativeLayout) findViewById(R.id.color_chooser);
+        DisplayMetrics metrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+
+        colorChooser.measure(View.MeasureSpec.makeMeasureSpec(metrics.widthPixels, View.MeasureSpec.AT_MOST),
+                View.MeasureSpec.makeMeasureSpec(metrics.heightPixels, View.MeasureSpec.AT_MOST));
+        int realWidth = colorChooser.getMeasuredWidth();
+
+        ViewGroup.LayoutParams layoutParams = colorChooser.getLayoutParams();
+        Assert.assertNotNull(layoutParams);
+        layoutParams.height = realWidth / radioGroupColor.getChildCount();
+        colorChooser.setLayoutParams(layoutParams);
+        colorChooser.invalidate();
+        //----------------------------------------
+
+        // Initialize the drawer menu
+        DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+
+        mDrawerToggle = new ActionBarDrawerToggle(
+                this,                  /* host Activity */
+                drawerLayout,         /* DrawerLayout object */
+                R.drawable.ic_drawer,  /* nav drawer icon to replace 'Up' caret */
+                R.string.drawer_open,  /* "open drawer" description */
+                R.string.drawer_close  /* "close drawer" description */
+        );
+
+        // Set the drawer toggle as the DrawerListener:
+        drawerLayout.setDrawerListener(mDrawerToggle);
+
+        // Disable swipe gesture to open and close the drawer:
+        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_OPEN);
+        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+
+        ActionBar actionBar = getActionBar();
+        Assert.assertNotNull(actionBar);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setHomeButtonEnabled(true);
+        //----------------------------------------
+
         mDrawView = (DrawingView)findViewById(R.id.drawing);
 
-        mNewBtn = (ImageButton)findViewById(R.id.new_btn);
-        mSaveBtn = (ImageButton)findViewById(R.id.save_btn);
+        ImageButton newBtn = (ImageButton) findViewById(R.id.new_btn);
+        ImageButton saveBtn = (ImageButton) findViewById(R.id.save_btn);
 
-        mNewBtn.setOnClickListener(this);
-        mSaveBtn.setOnClickListener(this);
+        newBtn.setOnClickListener(this);
+        saveBtn.setOnClickListener(this);
 
         mBrushSizeChooserText = (TextView)findViewById(R.id.brush_size_chooser_text);
         mBrushSizeChooserTitle = (TextView)findViewById(R.id.brush_size_chooser_title);
@@ -132,13 +184,15 @@ public class Dnp extends Activity implements View.OnClickListener {
                     String imgSaved = MediaStore.Images.Media.insertImage(
                         getContentResolver(), mDrawView.getDrawingCache(),
                         UUID.randomUUID().toString()+".png", "drawing");
+                    Context applicationContext = getApplicationContext();
+                    Assert.assertNotNull(applicationContext);
                     if(imgSaved!=null){
-                        Toast savedToast = Toast.makeText(getApplicationContext(),
+                        Toast savedToast = Toast.makeText(applicationContext,
                                 R.string.save_dialog_ok, Toast.LENGTH_SHORT);
                         savedToast.show();
                     }
                     else{
-                        Toast unsavedToast = Toast.makeText(getApplicationContext(),
+                        Toast unsavedToast = Toast.makeText(applicationContext,
                                 R.string.save_dialog_ko, Toast.LENGTH_SHORT);
                         unsavedToast.show();
                     }
@@ -154,18 +208,15 @@ public class Dnp extends Activity implements View.OnClickListener {
         }
     }
 
-//    @Override
-//    protected void onSaveInstanceState(android.os.Bundle outState) {
-//        super.onSaveInstanceState(outState);
-//        outState.putInt("PAINT_BUTTON", mCurrPaint.getId());
-//
-//
-//    }
-//
-//    @Override
-//    protected void onRestoreInstanceState(final android.os.Bundle savedInstanceState) {
-//        paintClicked(findViewById(savedInstanceState.getInt("PAINT_BUTTON")));
-//        super.onRestoreInstanceState(savedInstanceState);
-//    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Pass the event to ActionBarDrawerToggle, if it returns
+        // true, then it has handled the app icon touch event
+        if (mDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+        // Handle your other action bar items...
 
+        return super.onOptionsItemSelected(item);
+    }
 }
