@@ -9,7 +9,6 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
-import android.graphics.drawable.ColorDrawable;
 import android.support.v4.view.MotionEventCompat;
 import android.util.AttributeSet;
 import android.util.TypedValue;
@@ -95,11 +94,11 @@ public class DrawingView extends View {
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeJoin(Paint.Join.ROUND);
         paint.setStrokeCap(Paint.Cap.ROUND);
-        setPaintColor(paint, isHollow);
+        paint.setColor(mPaintColor);
 
         //update size
         setBrushSize(paint, size);
-        if (mEraseMode) {
+        if (mEraseMode || isHollow) {
             paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
         }
         return paint;
@@ -112,17 +111,6 @@ public class DrawingView extends View {
                 size, resources.getDisplayMetrics()));
 
     }
-
-    private void setPaintColor(Paint paint, boolean isHollow) {
-        if (isHollow) {
-            ColorDrawable colorDrawable = (ColorDrawable)findViewById(R.id.drawing).getBackground();
-            Assert.assertNotNull(colorDrawable);
-            paint.setColor(colorDrawable.getColor());
-        } else {
-            paint.setColor(mPaintColor);
-        }
-    }
-
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
@@ -163,7 +151,8 @@ public class DrawingView extends View {
 
                 mDrawCanvas.drawPath(path, paint);
                 mDrawPaths.put(id, path);
-                if (mHollowMode) {
+                // Create Hollow paint only if eraseMode is not enable
+                if (mHollowMode && !mEraseMode) {
                     Paint paintHollow = createPaint((size / MAJOR_TOUCH_RATIO) - ((size / MAJOR_TOUCH_RATIO) * HOLLOW_LINE_THICKNESS_RATIO / 100), true);
                     mDrawCanvas.drawPath(path, paintHollow);
                     mDrawPaintsHollow.put(id, paintHollow);
@@ -185,11 +174,9 @@ public class DrawingView extends View {
                         path.lineTo(touchX, touchY);
                         paint = mDrawPaints.get(currentId);
                         mDrawCanvas.drawPath(path, paint);
-                        if (mHollowMode) {
-                            Paint paintHollow = mDrawPaintsHollow.get(currentId);
-                            if (paintHollow != null) {
-                                mDrawCanvas.drawPath(path, paintHollow);
-                            }
+                        Paint paintHollow = mDrawPaintsHollow.get(currentId);
+                        if (paintHollow != null) {
+                            mDrawCanvas.drawPath(path, paintHollow);
                         }
                         invalidate();
                     }
@@ -204,10 +191,8 @@ public class DrawingView extends View {
                 path.close();
                 // Delete paint:
                 mDrawPaints.remove(id);
-                if (mHollowMode) {
-                    // Delete paint hollow:
-                    mDrawPaintsHollow.remove(id);
-                }
+                // Delete paint hollow:
+                mDrawPaintsHollow.remove(id);
                 break;
 
             default:
