@@ -160,15 +160,18 @@ public class DrawingView extends View {
                 path.moveTo(touchX, touchY);
                 path.lineTo(touchX - 1, touchY - 1);
                 Paint paint = createPaint(size / MAJOR_TOUCH_RATIO, false);
-                Paint paintHollow = createPaint((size / MAJOR_TOUCH_RATIO) - ((size / MAJOR_TOUCH_RATIO) * HOLLOW_LINE_THICKNESS_RATIO / 100), true);
+
                 mDrawCanvas.drawPath(path, paint);
-                if (mHollowMode) {
-                    mDrawCanvas.drawPath(path, paintHollow);
-                }
-                invalidate();
                 mDrawPaths.put(id, path);
+                if (mHollowMode) {
+                    Paint paintHollow = createPaint((size / MAJOR_TOUCH_RATIO) - ((size / MAJOR_TOUCH_RATIO) * HOLLOW_LINE_THICKNESS_RATIO / 100), true);
+                    mDrawCanvas.drawPath(path, paintHollow);
+                    mDrawPaintsHollow.put(id, paintHollow);
+                }
                 mDrawPaints.put(id, paint);
-                mDrawPaintsHollow.put(id, paintHollow);
+                invalidate();
+
+
                 break;
 
             case MotionEvent.ACTION_MOVE:
@@ -176,15 +179,17 @@ public class DrawingView extends View {
                 for (int i = 0; i < MotionEventCompat.getPointerCount(event); i++) {
                     int currentId = MotionEventCompat.getPointerId(event, i);
                     path = mDrawPaths.get(currentId);
-                    paint = mDrawPaints.get(currentId);
-                    paintHollow = mDrawPaintsHollow.get(currentId);
                     if (path != null) {
                         touchX = MotionEventCompat.getX(event, i);
                         touchY = MotionEventCompat.getY(event, i);
                         path.lineTo(touchX, touchY);
+                        paint = mDrawPaints.get(currentId);
                         mDrawCanvas.drawPath(path, paint);
                         if (mHollowMode) {
-                            mDrawCanvas.drawPath(path, paintHollow);
+                            Paint paintHollow = mDrawPaintsHollow.get(currentId);
+                            if (paintHollow != null) {
+                                mDrawCanvas.drawPath(path, paintHollow);
+                            }
                         }
                         invalidate();
                     }
@@ -199,8 +204,10 @@ public class DrawingView extends View {
                 path.close();
                 // Delete paint:
                 mDrawPaints.remove(id);
-                // Delete paint hollow:
-                mDrawPaintsHollow.remove(id);
+                if (mHollowMode) {
+                    // Delete paint hollow:
+                    mDrawPaintsHollow.remove(id);
+                }
                 break;
 
             default:
