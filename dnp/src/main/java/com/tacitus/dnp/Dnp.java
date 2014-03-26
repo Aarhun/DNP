@@ -4,18 +4,23 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.tacitus.dnp.widget.DrawingView;
+
+import java.util.UUID;
 
 public class Dnp extends Activity implements View.OnClickListener {
 
     private DrawingView mDrawView;
     private ImageButton mNewBtn;
+    private ImageButton mSaveBtn;
     private SeekBar mBrushSizeChooser;
     private TextView mBrushSizeChooserText;
     private TextView mBrushSizeChooserTitle;
@@ -27,8 +32,10 @@ public class Dnp extends Activity implements View.OnClickListener {
         mDrawView = (DrawingView)findViewById(R.id.drawing);
 
         mNewBtn = (ImageButton)findViewById(R.id.new_btn);
+        mSaveBtn = (ImageButton)findViewById(R.id.save_btn);
 
         mNewBtn.setOnClickListener(this);
+        mSaveBtn.setOnClickListener(this);
 
         mBrushSizeChooserText = (TextView)findViewById(R.id.brush_size_chooser_text);
         mBrushSizeChooserTitle = (TextView)findViewById(R.id.brush_size_chooser_title);
@@ -114,6 +121,36 @@ public class Dnp extends Activity implements View.OnClickListener {
                 }
             });
             newDialog.show();
+        } else if(view.getId()==R.id.save_btn){
+            //save drawing
+            AlertDialog.Builder saveDialog = new AlertDialog.Builder(this);
+            saveDialog.setTitle(R.string.save_dialog_title);
+            saveDialog.setMessage(R.string.save_dialog_message);
+            saveDialog.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener(){
+                public void onClick(DialogInterface dialog, int which){
+                    mDrawView.setDrawingCacheEnabled(true);
+                    String imgSaved = MediaStore.Images.Media.insertImage(
+                        getContentResolver(), mDrawView.getDrawingCache(),
+                        UUID.randomUUID().toString()+".png", "drawing");
+                    if(imgSaved!=null){
+                        Toast savedToast = Toast.makeText(getApplicationContext(),
+                                R.string.save_dialog_ok, Toast.LENGTH_SHORT);
+                        savedToast.show();
+                    }
+                    else{
+                        Toast unsavedToast = Toast.makeText(getApplicationContext(),
+                                R.string.save_dialog_ko, Toast.LENGTH_SHORT);
+                        unsavedToast.show();
+                    }
+                    mDrawView.destroyDrawingCache();
+                }
+            });
+            saveDialog.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener(){
+                public void onClick(DialogInterface dialog, int which){
+                    dialog.cancel();
+                }
+            });
+            saveDialog.show();
         }
     }
 
