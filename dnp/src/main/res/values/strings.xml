@@ -11,6 +11,7 @@
     <string name="paint">Paint</string>
     <string name="hollow_text">Hollow mode:</string>
     <string name="touch_size_text">Touch size mode:</string>
+    <string name="erase_mode_text">Erase mode:</string>
     <string name="brush_size">Brush size:</string>
     <string name="sml">Small</string>
     <string name="med">Medium</string>

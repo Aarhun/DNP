@@ -27,15 +27,6 @@ tools:context=".MainActivity" >
 
 
             <ImageButton
-                android:id="@+id/erase_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:contentDescription="@string/erase"
-                android:src="@drawable/eraser"/>
-
-
-            <ImageButton
                 android:id="@+id/save_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -96,6 +87,27 @@ tools:context=".MainActivity" >
                         android:layout_margin="2dp"
                         android:onClick="hollowClicked"
                         android:layout_gravity="right|center_horizontal"/>
+                </LinearLayout>
+                <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_weight="1"
+                        android:layout_marginBottom="2dp"
+                        android:layout_marginTop="2dp">
+                    <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/erase_mode_text"
+                            android:textColor="@android:color/black"
+                            android:layout_gravity="left|center_horizontal"/>
+                    <Switch
+                            android:id="@+id/erase_mode"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="2dp"
+                            android:onClick="eraseClicked"
+                            android:layout_gravity="right|center_horizontal"/>
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"

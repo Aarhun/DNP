@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.drawable.ColorDrawable;
 import android.support.v4.view.MotionEventCompat;
 import android.util.AttributeSet;
@@ -44,6 +45,7 @@ public class DrawingView extends View {
 
     private boolean mHollowMode = false;
     private boolean mTouchSizeMode = true;
+    private boolean mEraseMode = false;
 
 
     //canvas bitmap
@@ -97,6 +99,9 @@ public class DrawingView extends View {
 
         //update size
         setBrushSize(paint, size);
+        if (mEraseMode) {
+            paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+        }
         return paint;
     }
 
@@ -222,6 +227,10 @@ public class DrawingView extends View {
 
     public void setHollowMode(boolean hollowMode) {
         mHollowMode = hollowMode;
+    }
+
+    public void setEraseMode(boolean eraseMode) {
+        mEraseMode = eraseMode;
     }
 
     public void setTouchSizeMode(boolean touchSizeMode) {

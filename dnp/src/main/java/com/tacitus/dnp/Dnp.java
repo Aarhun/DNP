@@ -69,7 +69,15 @@ public class Dnp extends Activity implements View.OnClickListener {
         } else {
             mDrawView.setHollowMode(false);
         }
+    }
 
+     public void eraseClicked(View view) {
+        boolean on = ((Switch) view).isChecked();
+        if (on) {
+            mDrawView.setEraseMode(true);
+        } else {
+            mDrawView.setEraseMode(false);
+        }
     }
 
     public void touchSizeModeClicked(View view) {
