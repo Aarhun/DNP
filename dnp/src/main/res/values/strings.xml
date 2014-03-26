@@ -13,6 +13,9 @@
     <string name="touch_size_text">Touch size mode:</string>
     <string name="erase_mode_text">Erase mode:</string>
     <string name="brush_size">Brush size:</string>
+    <string name="new_dialog_title">New drawing</string>
+    <string name="new_dialog_message">Start new drawing (you will lose the current drawing)?</string>
+    <string name="save_dialog_title">Save drawing</string>
     <string name="save_dialog_message">Save drawing to device Gallery?</string>
     <string name="save_dialog_ok">Drawing saved to Gallery!</string>
     <string name="save_dialog_ko">Oops! Image could not be saved.</string>

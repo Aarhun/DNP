@@ -107,15 +107,15 @@ public class Dnp extends Activity implements View.OnClickListener {
         if(view.getId()==R.id.new_btn){
             //new button
             AlertDialog.Builder newDialog = new AlertDialog.Builder(this);
-            newDialog.setTitle("New drawing");
-            newDialog.setMessage("Start new drawing (you will lose the current drawing)?");
-            newDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener(){
-                public void onClick(DialogInterface dialog, int which){
+            newDialog.setTitle(R.string.new_dialog_title);
+            newDialog.setMessage(R.string.new_dialog_message);
+            newDialog.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
                     mDrawView.startNew();
                     dialog.dismiss();
                 }
             });
-            newDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener(){
+            newDialog.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener(){
                 public void onClick(DialogInterface dialog, int which){
                     dialog.cancel();
                 }
