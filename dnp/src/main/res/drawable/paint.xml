@@ -10,6 +10,7 @@
                 android:left="0dp"
                 android:right="0dp"
                 android:top="0dp" />
+            <solid android:color="#00000000" />
         </shape>
     </item>
     <item>
@@ -18,6 +19,7 @@
                 android:width="6dp"
                 android:color="#FF999999" />
             <corners android:radius="20dp" />
+            <solid android:color="#00000000" />
         </shape>
     </item>
 </layer-list>
