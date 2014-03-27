@@ -11,6 +11,7 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.support.v4.view.MotionEventCompat;
 import android.util.AttributeSet;
+import android.util.SparseArray;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
@@ -19,16 +20,46 @@ import com.tacitus.dnp.R;
 
 import junit.framework.Assert;
 
-import java.util.HashMap;
-import java.util.Map;
-
 
 public class DrawingView extends View {
 
+    private class DrawPath {
+        private Path mDrawPath;
+        private Paint mDrawPaint;
+        private Paint mDrawPaintHollow ;
+
+        private DrawPath(float size) {
+            mDrawPath = new Path();
+            mDrawPaint = createPaint(size, false);
+            // Create Hollow paint only if eraseMode is not enable
+            if (mHollowMode && !mEraseMode) {
+                mDrawPaintHollow = createPaint(size - (size * HOLLOW_LINE_THICKNESS_RATIO / 100), true);
+            }
+        }
+
+        public void moveTo(float x, float y) {
+            mDrawPath.moveTo(x, y);
+        }
+
+        public void lineTo(float x, float y) {
+            mDrawPath.lineTo(x, y);
+        }
+
+        public void drawPath() {
+            mDrawCanvas.drawPath(mDrawPath, mDrawPaint);
+            if (mDrawPaintHollow != null) {
+                mDrawCanvas.drawPath(mDrawPath, mDrawPaintHollow);
+            }
+            invalidate();
+        }
+
+        public void closePath() {
+            mDrawPath.close();
+        }
+    }
+
     //drawing path & paint
-    private Map<Integer, Path> mDrawPaths = new HashMap<Integer, Path>();
-    private Map<Integer, Paint> mDrawPaints = new HashMap<Integer, Paint>();
-    private Map<Integer, Paint> mDrawPaintsHollow = new HashMap<Integer, Paint>();
+    private SparseArray<DrawPath> mDrawPaths = new SparseArray<DrawPath>();
 
     private final float MAJOR_TOUCH_RATIO = 1.5f;
     private final int HOLLOW_LINE_THICKNESS_RATIO = 20;
@@ -110,41 +141,23 @@ public class DrawingView extends View {
             case MotionEvent.ACTION_POINTER_DOWN:
             case MotionEvent.ACTION_DOWN:
                 // Create path and draw a small line of 1 pixel:
-                Path path = new Path();
-                path.moveTo(touchX, touchY);
-                path.lineTo(touchX - 1, touchY - 1);
-                Paint paint = createPaint(size / MAJOR_TOUCH_RATIO, false);
-
-                mDrawCanvas.drawPath(path, paint);
-                mDrawPaths.put(id, path);
-                // Create Hollow paint only if eraseMode is not enable
-                if (mHollowMode && !mEraseMode) {
-                    Paint paintHollow = createPaint((size / MAJOR_TOUCH_RATIO) - ((size / MAJOR_TOUCH_RATIO) * HOLLOW_LINE_THICKNESS_RATIO / 100), true);
-                    mDrawCanvas.drawPath(path, paintHollow);
-                    mDrawPaintsHollow.put(id, paintHollow);
-                }
-                mDrawPaints.put(id, paint);
-                invalidate();
-
-
+                DrawPath drawPath = new DrawPath(size / MAJOR_TOUCH_RATIO);
+                drawPath.moveTo(touchX, touchY);
+                drawPath.lineTo(touchX - 1, touchY - 1);
+                drawPath.drawPath();
+                mDrawPaths.put(id, drawPath);
                 break;
 
             case MotionEvent.ACTION_MOVE:
                 // In case of ACTION_MOVE event we update all paths:
                 for (int i = 0; i < MotionEventCompat.getPointerCount(event); i++) {
                     int currentId = MotionEventCompat.getPointerId(event, i);
-                    path = mDrawPaths.get(currentId);
-                    if (path != null) {
+                    drawPath = mDrawPaths.get(currentId);
+                    if (drawPath != null) {
                         touchX = MotionEventCompat.getX(event, i);
                         touchY = MotionEventCompat.getY(event, i);
-                        path.lineTo(touchX, touchY);
-                        paint = mDrawPaints.get(currentId);
-                        mDrawCanvas.drawPath(path, paint);
-                        Paint paintHollow = mDrawPaintsHollow.get(currentId);
-                        if (paintHollow != null) {
-                            mDrawCanvas.drawPath(path, paintHollow);
-                        }
-                        invalidate();
+                        drawPath.lineTo(touchX, touchY);
+                        drawPath.drawPath();
                     }
                 }
                 break;
@@ -153,12 +166,11 @@ public class DrawingView extends View {
             case MotionEvent.ACTION_POINTER_UP:
             case MotionEvent.ACTION_UP:
                 // Delete path:
-                path = mDrawPaths.remove(id);
-                path.close();
-                // Delete paint:
-                mDrawPaints.remove(id);
-                // Delete paint hollow:
-                mDrawPaintsHollow.remove(id);
+                drawPath = mDrawPaths.get(id);
+                if (drawPath != null) {
+                    mDrawPaths.remove(id);
+                    drawPath.closePath();
+                }
                 break;
 
             default:
