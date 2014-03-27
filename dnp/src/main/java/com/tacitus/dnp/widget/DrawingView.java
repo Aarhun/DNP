@@ -81,8 +81,10 @@ public class DrawingView extends View {
 
     public DrawingView(Context context, AttributeSet attrs){
         super(context, attrs);
+        Resources resources = getResources();
+        Assert.assertNotNull(resources);
         mCanvasPaint = new Paint(Paint.DITHER_FLAG);
-        setBrushSize(getResources().getDimension(R.dimen.initial_size));
+        setBrushSize(resources.getDimension(R.dimen.initial_size));
     }
 
     private Paint createPaint(float size, boolean isHollow) {
