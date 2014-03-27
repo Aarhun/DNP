@@ -3,9 +3,12 @@ package com.tacitus.dnp;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
@@ -25,6 +28,8 @@ import com.tacitus.dnp.widget.DrawingView;
 
 import junit.framework.Assert;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.UUID;
 
 public class Dnp extends Activity implements View.OnClickListener {
@@ -181,20 +186,54 @@ public class Dnp extends Activity implements View.OnClickListener {
             saveDialog.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener(){
                 public void onClick(DialogInterface dialog, int which){
                     mDrawView.setDrawingCacheEnabled(true);
-                    String imgSaved = MediaStore.Images.Media.insertImage(
-                        getContentResolver(), mDrawView.getDrawingCache(),
-                        UUID.randomUUID().toString()+".png", "drawing");
+
+                    String dirPath = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separatorChar + "Pictures";
+                    String fileTitle = UUID.randomUUID().toString();
+                    String fileName = fileTitle + ".png";
+                    File image = new File(dirPath, fileName);
                     Context applicationContext = getApplicationContext();
                     Assert.assertNotNull(applicationContext);
-                    if(imgSaved!=null){
-                        Toast savedToast = Toast.makeText(applicationContext,
-                                R.string.save_dialog_ok, Toast.LENGTH_SHORT);
-                        savedToast.show();
+                    Bitmap drawingCache = mDrawView.getDrawingCache();
+                    Assert.assertNotNull(drawingCache);
+                    boolean error = false;
+                    try {
+                        // Ensure the file has an unique name:
+                        while (!image.createNewFile()) {
+                            fileTitle = UUID.randomUUID().toString();
+                            fileName = fileTitle + ".png";
+                            image = new File(dirPath, fileName);
+                        }
+                        FileOutputStream fileOutputStream = new FileOutputStream(image);
+                        drawingCache.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream);
+                        fileOutputStream.flush();
+                        fileOutputStream.close();
+
+                        // Update content database:
+                        ContentValues values = new ContentValues(7);
+
+                        values.put(MediaStore.Images.Media.TITLE, "DNP-drawing-" + fileTitle);
+                        values.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
+                        values.put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis());
+                        values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+                        values.put(MediaStore.Images.Media.ORIENTATION, 0);
+                        values.put(MediaStore.Images.Media.DATA, image.getAbsolutePath());
+                        values.put(MediaStore.Images.Media.SIZE, image.length());
+
+                        getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        error = true;
                     }
-                    else{
+
+                    if (error) {
                         Toast unsavedToast = Toast.makeText(applicationContext,
                                 R.string.save_dialog_ko, Toast.LENGTH_SHORT);
                         unsavedToast.show();
+                    } else {
+                        Toast savedToast = Toast.makeText(applicationContext,
+                                R.string.save_dialog_ok, Toast.LENGTH_SHORT);
+                        savedToast.show();
                     }
                     mDrawView.destroyDrawingCache();
                 }
