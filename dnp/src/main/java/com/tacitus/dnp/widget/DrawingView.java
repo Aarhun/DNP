@@ -214,6 +214,7 @@ public class DrawingView extends View {
     }
 
     public void loadImage(Bitmap bitmap) {
+        mDrawCanvas.drawColor(0, PorterDuff.Mode.CLEAR);
         mDrawCanvas.drawBitmap(bitmap, 0, 0, null);
         invalidate();
     }
