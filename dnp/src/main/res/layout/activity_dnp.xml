@@ -307,7 +307,7 @@
                 android:layout_height="match_parent"
                 android:contentDescription="@string/start_new"
                 android:layout_gravity="center"
-                android:src="@drawable/new_pic"/>
+                android:src="@android:drawable/ic_menu_add"/>
 
 
             <ImageButton
@@ -316,7 +316,7 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:contentDescription="@string/save"
-                android:src="@drawable/save"/>
+                android:src="@android:drawable/ic_menu_save"/>
 
 
             <ImageButton
