@@ -7,6 +7,7 @@
     <string name="brush">Brush</string>
     <string name="erase">Erase</string>
     <string name="save">Save</string>
+    <string name="load">Load</string>
     <string name="paint">Paint</string>
     <string name="hollow_text">Hollow mode:</string>
     <string name="touch_size_text">Touch size mode:</string>
@@ -16,6 +17,8 @@
     <string name="new_dialog_message">Start new drawing (you will lose the current drawing)?</string>
     <string name="save_dialog_title">Save drawing</string>
     <string name="save_dialog_message">Save drawing to device Gallery?</string>
+    <string name="load_dialog_title">Load drawing</string>
+    <string name="load_dialog_message">Load drawing from device Gallery?</string>
     <string name="save_dialog_ok">Drawing saved to Gallery!</string>
     <string name="save_dialog_ko">Oops! Image could not be saved.</string>
     <string name="sml">Small</string>

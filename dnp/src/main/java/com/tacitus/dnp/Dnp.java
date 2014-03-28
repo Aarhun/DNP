@@ -6,7 +6,11 @@ import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -39,6 +43,7 @@ public class Dnp extends Activity implements View.OnClickListener {
     private TextView mBrushSizeChooserText;
     private TextView mBrushSizeChooserTitle;
     private ActionBarDrawerToggle mDrawerToggle;
+    private int RESULT_LOAD_IMAGE = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,9 +95,11 @@ public class Dnp extends Activity implements View.OnClickListener {
 
         ImageButton newBtn = (ImageButton) findViewById(R.id.new_btn);
         ImageButton saveBtn = (ImageButton) findViewById(R.id.save_btn);
+        ImageButton loadBtn = (ImageButton) findViewById(R.id.load_btn);
 
         newBtn.setOnClickListener(this);
         saveBtn.setOnClickListener(this);
+        loadBtn.setOnClickListener(this);
 
         mBrushSizeChooserText = (TextView)findViewById(R.id.brush_size_chooser_text);
         mBrushSizeChooserTitle = (TextView)findViewById(R.id.brush_size_chooser_title);
@@ -244,8 +251,57 @@ public class Dnp extends Activity implements View.OnClickListener {
                 }
             });
             saveDialog.show();
+        } else if(view.getId()==R.id.load_btn) {
+            //load drawing
+            AlertDialog.Builder saveDialog = new AlertDialog.Builder(this);
+            saveDialog.setTitle(R.string.load_dialog_title);
+            saveDialog.setMessage(R.string.load_dialog_message);
+            saveDialog.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Intent intent = new Intent(
+                    Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+
+                    startActivityForResult(intent, RESULT_LOAD_IMAGE);
+
+                }
+            });
+            saveDialog.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+            saveDialog.show();
         }
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
+            Uri selectedImage = data.getData();
+            String[] filePathColumn = { MediaStore.Images.Media.DATA };
+
+            if (selectedImage != null) {
+                Cursor cursor = getContentResolver().query(selectedImage,
+                        filePathColumn, null, null, null);
+                if (cursor != null) {
+                    cursor.moveToFirst();
+
+                    int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                    String picturePath = cursor.getString(columnIndex);
+                    cursor.close();
+
+                    Bitmap bitmap = BitmapFactory.decodeFile(picturePath);
+                    if (bitmap != null) {
+                        mDrawView.loadImage(bitmap);
+                    }
+                }
+            }
+        }
+    }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -258,4 +314,5 @@ public class Dnp extends Activity implements View.OnClickListener {
 
         return super.onOptionsItemSelected(item);
     }
+
 }

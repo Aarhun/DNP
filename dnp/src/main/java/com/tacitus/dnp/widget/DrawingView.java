@@ -20,7 +20,6 @@ import com.tacitus.dnp.R;
 
 import junit.framework.Assert;
 
-
 public class DrawingView extends View {
 
     private class DrawPath {
@@ -211,6 +210,11 @@ public class DrawingView extends View {
 
     public void startNew(){
         mDrawCanvas.drawColor(0, PorterDuff.Mode.CLEAR);
+        invalidate();
+    }
+
+    public void loadImage(Bitmap bitmap) {
+        mDrawCanvas.drawBitmap(bitmap, 0, 0, null);
         invalidate();
     }
 }

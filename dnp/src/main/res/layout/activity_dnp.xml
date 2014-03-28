@@ -316,6 +316,15 @@
                 android:layout_gravity="center"
                 android:contentDescription="@string/save"
                 android:src="@drawable/save"/>
+
+
+            <ImageButton
+                android:id="@+id/load_btn"
+                android:layout_width="@dimen/tools_width"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:contentDescription="@string/load"
+                android:src="@android:drawable/ic_menu_gallery"/>
             </LinearLayout>
 
             <LinearLayout
