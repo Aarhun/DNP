@@ -297,6 +297,7 @@ public class Dnp extends Activity implements View.OnClickListener {
                     if (bitmap != null) {
                         mDrawView.loadImage(bitmap);
                     }
+                    bitmap.recycle();
                 }
             }
         }
