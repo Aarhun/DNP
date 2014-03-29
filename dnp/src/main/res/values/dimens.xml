@@ -11,7 +11,7 @@
     <dimen name="option_text_margin_top">10dp</dimen>
 
     <!-- Brush sizes -->
-    <dimen name="initial_size">40dp</dimen>
+    <integer name="initial_size">50</integer>
 
 
     </resources>

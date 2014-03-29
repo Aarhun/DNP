@@ -12,10 +12,11 @@ import android.graphics.PorterDuffXfermode;
 import android.support.v4.view.MotionEventCompat;
 import android.util.AttributeSet;
 import android.util.SparseArray;
-import android.util.TypedValue;
+import android.view.InputDevice;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.tacitus.dnp.Log;
 import com.tacitus.dnp.R;
 
 import junit.framework.Assert;
@@ -25,14 +26,23 @@ public class DrawingView extends View {
     private class DrawPath {
         private Path mDrawPath;
         private Paint mDrawPaint;
-        private Paint mDrawPaintHollow ;
+        private Paint mDrawPaintHollow;
 
-        private DrawPath(float size) {
+        private DrawPath(float size, float pressure) {
             mDrawPath = new Path();
-            mDrawPaint = createPaint(size, false);
+            mDrawPaint = createPaint();
+            if (!mTouchSizeMode) {
+                size = mBrushSize;
+            }
             // Create Hollow paint only if eraseMode is not enable
             if (mHollowMode && !mEraseMode) {
-                mDrawPaintHollow = createPaint(size - (size * HOLLOW_LINE_THICKNESS_RATIO / 100), true);
+                mDrawPaintHollow = createPaint();
+                mDrawPaintHollow.setStrokeWidth(size - (size * HOLLOW_LINE_THICKNESS_RATIO / 100));
+                mDrawPaintHollow.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+            }
+            mDrawPaint.setStrokeWidth(size);
+            if (mPressureMode) {
+                mDrawPaint.setAlpha((int) (pressure * 255));
             }
         }
 
@@ -55,12 +65,12 @@ public class DrawingView extends View {
         public void closePath() {
             mDrawPath.close();
         }
+
     }
 
     //drawing path & paint
     private SparseArray<DrawPath> mDrawPaths = new SparseArray<DrawPath>();
 
-    private final float MAJOR_TOUCH_RATIO = 1.5f;
     private final int HOLLOW_LINE_THICKNESS_RATIO = 20;
 
     private Paint mCanvasPaint;
@@ -71,6 +81,7 @@ public class DrawingView extends View {
     private boolean mHollowMode = false;
     private boolean mTouchSizeMode = true;
     private boolean mEraseMode = false;
+    private boolean mPressureMode = false;
 
 
     //canvas bitmap
@@ -83,31 +94,20 @@ public class DrawingView extends View {
         Resources resources = getResources();
         Assert.assertNotNull(resources);
         mCanvasPaint = new Paint(Paint.DITHER_FLAG);
-        setBrushSize(resources.getDimension(R.dimen.initial_size));
+        setBrushSize(resources.getInteger(R.integer.initial_size) * 2);
     }
 
-    private Paint createPaint(float size, boolean isHollow) {
+    private Paint createPaint() {
         Paint paint = new Paint();
         paint.setAntiAlias(true);
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeJoin(Paint.Join.ROUND);
         paint.setStrokeCap(Paint.Cap.ROUND);
         paint.setColor(mPaintColor);
-
-        //update size
-        setBrushSize(paint, size);
-        if (mEraseMode || isHollow) {
+        if (mEraseMode) {
             paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
         }
         return paint;
-    }
-
-    private void setBrushSize(Paint paint, float size) {
-        Resources resources = getResources();
-        Assert.assertNotNull(resources);
-        paint.setStrokeWidth(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                size, resources.getDisplayMetrics()));
-
     }
 
     @Override
@@ -124,6 +124,77 @@ public class DrawingView extends View {
         canvas.drawBitmap(mCanvasBitmap, 0, 0, mCanvasPaint);
     }
 
+    private void logEvent(MotionEvent event) {
+        int index = MotionEventCompat.getActionIndex(event);
+        for (InputDevice.MotionRange motionRange : event.getDevice().getMotionRanges()) {
+            switch (motionRange.getAxis()) {
+                case MotionEvent.AXIS_X:
+                    Log.e("AXIS_X");
+                    Log.e("Max: ", motionRange.getMax());
+                    Log.e("Min: ", motionRange.getMin());
+                    Log.e("Current: ", event.getX(index));
+                    Log.e("***********************");
+                    break;
+                case MotionEvent.AXIS_Y:
+                    Log.e("AXIS_Y");
+                    Log.e("Max: ", motionRange.getMax());
+                    Log.e("Min: ", motionRange.getMin());
+                    Log.e("Current: ", event.getY(index));
+                    Log.e("***********************");
+                    break;
+                case MotionEvent.AXIS_PRESSURE:
+                    Log.e("AXIS_PRESSURE");
+                    Log.e("Max: ", motionRange.getMax());
+                    Log.e("Min: ", motionRange.getMin());
+                    Log.e("Current: ", event.getPressure(index));
+                    Log.e("***********************");
+                    break;
+                case MotionEvent.AXIS_SIZE:
+                    Log.e("AXIS_SIZE");
+                    Log.e("Max: ", motionRange.getMax());
+                    Log.e("Min: ", motionRange.getMin());
+                    Log.e("Current: ", event.getSize(index));
+                    Log.e("***********************");
+                    break;
+                case MotionEvent.AXIS_TOUCH_MAJOR:
+                    Log.e("AXIS_TOUCH_MAJOR");
+                    Log.e("Max: ", motionRange.getMax());
+                    Log.e("Min: ", motionRange.getMin());
+                    Log.e("Current: ", event.getTouchMajor(index));
+                    Log.e("***********************");
+                    break;
+                case MotionEvent.AXIS_TOUCH_MINOR:
+                    Log.e("AXIS_TOUCH_MINOR");
+                    Log.e("Max: ", motionRange.getMax());
+                    Log.e("Min: ", motionRange.getMin());
+                    Log.e("Current: ", event.getTouchMinor(index));
+                    Log.e("***********************");
+                    break;
+                case MotionEvent.AXIS_TOOL_MAJOR:
+                    Log.e("AXIS_TOOL_MAJOR");
+                    Log.e("Max: ", motionRange.getMax());
+                    Log.e("Min: ", motionRange.getMin());
+                    Log.e("Current: ", event.getToolMajor(index));
+                    Log.e("***********************");
+                    break;
+                case MotionEvent.AXIS_TOOL_MINOR:
+                    Log.e("AXIS_TOOL_MINOR");
+                    Log.e("Max: ", motionRange.getMax());
+                    Log.e("Min: ", motionRange.getMin());
+                    Log.e("Current: ", event.getToolMinor(index));
+                    Log.e("***********************");
+                    break;
+                case MotionEvent.AXIS_ORIENTATION:
+                    Log.e("AXIS_ORIENTATION");
+                    Log.e("Max: ", motionRange.getMax());
+                    Log.e("Min: ", motionRange.getMin());
+                    Log.e("Current: ", event.getOrientation(index));
+                    Log.e("***********************");
+                    break;
+            }
+        }
+    }
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         float touchX = MotionEventCompat.getX(event, MotionEventCompat.getActionIndex(event));
@@ -133,16 +204,17 @@ public class DrawingView extends View {
         int index = MotionEventCompat.getActionIndex(event);
         // Id of multiple touch event
         int id = MotionEventCompat.getPointerId(event, index);
-        float size = mBrushSize;
-        if (mTouchSizeMode) {
-            size = event.getTouchMajor(index);
-        }
+
+        float size = event.getTouchMajor(index);
+        float pressure = event.getPressure(index);
 
         switch (MotionEventCompat.getActionMasked(event)) {
             case MotionEvent.ACTION_POINTER_DOWN:
             case MotionEvent.ACTION_DOWN:
+//                logEvent(event);
+
                 // Create path and draw a small line of 1 pixel:
-                DrawPath drawPath = new DrawPath(size / MAJOR_TOUCH_RATIO);
+                DrawPath drawPath = new DrawPath(size, pressure);
                 drawPath.moveTo(touchX, touchY);
                 drawPath.lineTo(touchX - 1, touchY - 1);
                 drawPath.drawPath();
@@ -188,12 +260,9 @@ public class DrawingView extends View {
         mPaintColor = Color.parseColor(newColor);
     }
 
-    public void setBrushSize(float newSize){
+    public void setBrushSize(float brushSize){
         //update size
-        Resources resources = getResources();
-        Assert.assertNotNull(resources);
-        mBrushSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                newSize, resources.getDisplayMetrics());
+        mBrushSize = brushSize;
     }
 
     public void setHollowMode(boolean hollowMode) {
@@ -206,6 +275,10 @@ public class DrawingView extends View {
 
     public void setTouchSizeMode(boolean touchSizeMode) {
         mTouchSizeMode = touchSizeMode;
+    }
+
+    public void setPressureMode(boolean pressureMode) {
+        mPressureMode = pressureMode;
     }
 
     public void startNew(){

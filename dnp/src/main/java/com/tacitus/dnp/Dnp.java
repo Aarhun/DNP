@@ -124,7 +124,7 @@ public class Dnp extends Activity implements View.OnClickListener {
 
             }
         });
-        mBrushSizeChooser.setProgress((int) getResources().getDimension(R.dimen.initial_size));
+        mBrushSizeChooser.setProgress(getResources().getInteger(R.integer.initial_size));
     }
 
     public void paintClickedToggle(View view) {
