@@ -253,25 +253,25 @@ public class Dnp extends Activity implements View.OnClickListener {
             saveDialog.show();
         } else if(view.getId()==R.id.load_btn) {
             //load drawing
-            AlertDialog.Builder saveDialog = new AlertDialog.Builder(this);
-            saveDialog.setTitle(R.string.load_dialog_title);
-            saveDialog.setMessage(R.string.load_dialog_message);
-            saveDialog.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+            AlertDialog.Builder loadDialog = new AlertDialog.Builder(this);
+            loadDialog.setTitle(R.string.load_dialog_title);
+            loadDialog.setMessage(R.string.load_dialog_message);
+            loadDialog.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     Intent intent = new Intent(
-                    Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                            Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 
                     startActivityForResult(intent, RESULT_LOAD_IMAGE);
 
                 }
             });
-            saveDialog.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            loadDialog.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
                     dialog.cancel();
                 }
             });
-            saveDialog.show();
+            loadDialog.show();
         }
     }
 
