@@ -11,8 +11,10 @@
     <string name="paint">Paint</string>
     <string name="hollow_text">Hollow mode:</string>
     <string name="touch_size_text">Touch size mode:</string>
+    <string name="pressure_text">Pressure mode:</string>
     <string name="erase_mode_text">Erase mode:</string>
     <string name="brush_size">Brush size:</string>
+    <string name="alpha_value">Alpha value:</string>
     <string name="new_dialog_title">New drawing</string>
     <string name="new_dialog_message">Start new drawing (you will lose the current drawing)?</string>
     <string name="save_dialog_title">Save drawing</string>

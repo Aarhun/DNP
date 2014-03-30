@@ -14,4 +14,7 @@
     <integer name="initial_size">50</integer>
 
 
+    <integer name="initial_alpha">255</integer>
+
+
     </resources>

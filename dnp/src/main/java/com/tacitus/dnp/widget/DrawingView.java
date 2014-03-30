@@ -27,22 +27,30 @@ public class DrawingView extends View {
         private Path mDrawPath;
         private Paint mDrawPaint;
         private Paint mDrawPaintHollow;
+        private float mSize;
+        private float mSizeHollow;
+        private float mPressure;
 
         private DrawPath(float size, float pressure) {
             mDrawPath = new Path();
             mDrawPaint = createPaint();
+            mDrawPaint.setColor(mPaintColor);
+            mSize = size;
+            mPressure = pressure;
             if (!mTouchSizeMode) {
-                size = mBrushSize;
+                mSize = mBrushSize;
             }
             // Create Hollow paint only if eraseMode is not enable
             if (mHollowMode && !mEraseMode) {
+                mSizeHollow = mSize - (mSize * HOLLOW_LINE_THICKNESS_RATIO / 100);
                 mDrawPaintHollow = createPaint();
-                mDrawPaintHollow.setStrokeWidth(size - (size * HOLLOW_LINE_THICKNESS_RATIO / 100));
+                mDrawPaintHollow.setStrokeWidth(mSizeHollow);
                 mDrawPaintHollow.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
             }
-            mDrawPaint.setStrokeWidth(size);
+            mDrawPaint.setStrokeWidth(mSize);
+            mDrawPaint.setAlpha(mPaintAlpha);
             if (mPressureMode) {
-                mDrawPaint.setAlpha((int) (pressure * 255));
+                mDrawPaint.setAlpha((int) (mPressure * 255));
             }
         }
 
@@ -52,6 +60,14 @@ public class DrawingView extends View {
 
         public void lineTo(float x, float y) {
             mDrawPath.lineTo(x, y);
+        }
+
+        public void drawCircle(float x, float y) {
+            mDrawCanvas.drawCircle(x, y, mSize / 2, mDrawPaint);
+            if (mHollowMode && !mEraseMode) {
+                mDrawCanvas.drawCircle(x, y, mSizeHollow / 2, mDrawPaintHollow);
+            }
+
         }
 
         public void drawPath() {
@@ -89,6 +105,8 @@ public class DrawingView extends View {
 
     private float mBrushSize;
 
+    private int mPaintAlpha;
+
     public DrawingView(Context context, AttributeSet attrs){
         super(context, attrs);
         Resources resources = getResources();
@@ -103,7 +121,7 @@ public class DrawingView extends View {
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeJoin(Paint.Join.ROUND);
         paint.setStrokeCap(Paint.Cap.ROUND);
-        paint.setColor(mPaintColor);
+
         if (mEraseMode) {
             paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
         }
@@ -111,9 +129,9 @@ public class DrawingView extends View {
     }
 
     @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+    protected void onSizeChanged(int w, int h, int oldW, int oldH) {
         //view given size
-        super.onSizeChanged(w, h, oldw, oldh);
+        super.onSizeChanged(w, h, oldW, oldH);
         mCanvasBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         mDrawCanvas = new Canvas(mCanvasBitmap);
     }
@@ -205,7 +223,7 @@ public class DrawingView extends View {
         // Id of multiple touch event
         int id = MotionEventCompat.getPointerId(event, index);
 
-        float size = event.getTouchMajor(index);
+        float size = (event.getTouchMajor(index) + event.getTouchMinor(index)) / 2;
         float pressure = event.getPressure(index);
 
         switch (MotionEventCompat.getActionMasked(event)) {
@@ -264,6 +282,11 @@ public class DrawingView extends View {
         //update size
         mBrushSize = brushSize;
     }
+
+    public void setPaintAlpha(int alphaValue) {
+        mPaintAlpha = alphaValue;
+    }
+
 
     public void setHollowMode(boolean hollowMode) {
         mHollowMode = hollowMode;

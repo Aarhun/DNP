@@ -42,6 +42,9 @@ public class Dnp extends Activity implements View.OnClickListener {
     private SeekBar mBrushSizeChooser;
     private TextView mBrushSizeChooserText;
     private TextView mBrushSizeChooserTitle;
+    private SeekBar mAlphaChooser;
+    private TextView mAlphaChooserText;
+    private TextView mAlphaChooserTitle;
     private ActionBarDrawerToggle mDrawerToggle;
     private int RESULT_LOAD_IMAGE = 1;
 
@@ -125,6 +128,30 @@ public class Dnp extends Activity implements View.OnClickListener {
             }
         });
         mBrushSizeChooser.setProgress(getResources().getInteger(R.integer.initial_size));
+
+
+        mAlphaChooserText = (TextView)findViewById(R.id.alpha_chooser_text);
+        mAlphaChooserTitle = (TextView)findViewById(R.id.alpha_chooser_title);
+        mAlphaChooser = (SeekBar)findViewById(R.id.alpha_chooser);
+        mAlphaChooser.setEnabled(true);
+        mAlphaChooser.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                mDrawView.setPaintAlpha(progress);
+                mAlphaChooserText.setText(String.valueOf(progress));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+        mAlphaChooser.setProgress(getResources().getInteger(R.integer.initial_alpha));
     }
 
     public void paintClickedToggle(View view) {
@@ -163,6 +190,21 @@ public class Dnp extends Activity implements View.OnClickListener {
             mBrushSizeChooser.setEnabled(true);
             mBrushSizeChooserText.setTextColor(getResources().getColor(android.R.color.black));
             mBrushSizeChooserTitle.setTextColor(getResources().getColor(android.R.color.black));
+        }
+    }
+
+    public void pressureModeClicked(View view) {
+        boolean on = ((Switch) view).isChecked();
+        if (on) {
+            mDrawView.setPressureMode(true);
+            mAlphaChooser.setEnabled(false);
+            mAlphaChooserText.setTextColor(getResources().getColor(android.R.color.darker_gray));
+            mAlphaChooserTitle.setTextColor(getResources().getColor(android.R.color.darker_gray));
+        } else {
+            mDrawView.setPressureMode(false);
+            mAlphaChooser.setEnabled(true);
+            mAlphaChooserText.setTextColor(getResources().getColor(android.R.color.black));
+            mAlphaChooserTitle.setTextColor(getResources().getColor(android.R.color.black));
         }
     }
 
