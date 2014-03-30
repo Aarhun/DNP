@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/new_btn"
+        android:icon="@android:drawable/ic_menu_add"
+        android:title="@string/start_new"
+        android:showAsAction="ifRoom"/>
+
+
+    <item
+        android:id="@+id/save_btn"
+        android:title="@string/save"
+        android:icon="@android:drawable/ic_menu_save"
+        android:showAsAction="ifRoom"/>
+
+
+    <item
+        android:id="@+id/load_btn"
+        android:title="@string/load"
+        android:icon="@android:drawable/ic_menu_gallery"
+        android:showAsAction="ifRoom"/>
+</menu>

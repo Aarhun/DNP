@@ -17,6 +17,8 @@ import android.provider.MediaStore;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.util.DisplayMetrics;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -95,14 +97,6 @@ public class Dnp extends Activity implements View.OnClickListener {
         //----------------------------------------
 
         mDrawView = (DrawingView)findViewById(R.id.drawing);
-
-        ImageButton newBtn = (ImageButton) findViewById(R.id.new_btn);
-        ImageButton saveBtn = (ImageButton) findViewById(R.id.save_btn);
-        ImageButton loadBtn = (ImageButton) findViewById(R.id.load_btn);
-
-        newBtn.setOnClickListener(this);
-        saveBtn.setOnClickListener(this);
-        loadBtn.setOnClickListener(this);
 
         mBrushSizeChooserText = (TextView)findViewById(R.id.brush_size_chooser_text);
         mBrushSizeChooserTitle = (TextView)findViewById(R.id.brush_size_chooser_title);
@@ -210,111 +204,6 @@ public class Dnp extends Activity implements View.OnClickListener {
 
     @Override
     public void onClick(View view){
-        if(view.getId()==R.id.new_btn){
-            //new button
-            AlertDialog.Builder newDialog = new AlertDialog.Builder(this);
-            newDialog.setTitle(R.string.new_dialog_title);
-            newDialog.setMessage(R.string.new_dialog_message);
-            newDialog.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                    mDrawView.startNew();
-                    dialog.dismiss();
-                }
-            });
-            newDialog.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener(){
-                public void onClick(DialogInterface dialog, int which){
-                    dialog.cancel();
-                }
-            });
-            newDialog.show();
-        } else if(view.getId()==R.id.save_btn){
-            //save drawing
-            AlertDialog.Builder saveDialog = new AlertDialog.Builder(this);
-            saveDialog.setTitle(R.string.save_dialog_title);
-            saveDialog.setMessage(R.string.save_dialog_message);
-            saveDialog.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener(){
-                public void onClick(DialogInterface dialog, int which){
-                    mDrawView.setDrawingCacheEnabled(true);
-
-                    String dirPath = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separatorChar + "Pictures";
-                    String fileTitle = UUID.randomUUID().toString();
-                    String fileName = fileTitle + ".png";
-                    File image = new File(dirPath, fileName);
-                    Context applicationContext = getApplicationContext();
-                    Assert.assertNotNull(applicationContext);
-                    Bitmap drawingCache = mDrawView.getDrawingCache();
-                    Assert.assertNotNull(drawingCache);
-                    boolean error = false;
-                    try {
-                        // Ensure the file has an unique name:
-                        while (!image.createNewFile()) {
-                            fileTitle = UUID.randomUUID().toString();
-                            fileName = fileTitle + ".png";
-                            image = new File(dirPath, fileName);
-                        }
-                        FileOutputStream fileOutputStream = new FileOutputStream(image);
-                        drawingCache.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream);
-                        fileOutputStream.flush();
-                        fileOutputStream.close();
-
-                        // Update content database:
-                        ContentValues values = new ContentValues(7);
-
-                        values.put(MediaStore.Images.Media.TITLE, "DNP-drawing-" + fileTitle);
-                        values.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
-                        values.put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis());
-                        values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
-                        values.put(MediaStore.Images.Media.ORIENTATION, 0);
-                        values.put(MediaStore.Images.Media.DATA, image.getAbsolutePath());
-                        values.put(MediaStore.Images.Media.SIZE, image.length());
-
-                        getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        error = true;
-                    }
-
-                    if (error) {
-                        Toast unsavedToast = Toast.makeText(applicationContext,
-                                R.string.save_dialog_ko, Toast.LENGTH_SHORT);
-                        unsavedToast.show();
-                    } else {
-                        Toast savedToast = Toast.makeText(applicationContext,
-                                R.string.save_dialog_ok, Toast.LENGTH_SHORT);
-                        savedToast.show();
-                    }
-                    mDrawView.destroyDrawingCache();
-                }
-            });
-            saveDialog.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener(){
-                public void onClick(DialogInterface dialog, int which){
-                    dialog.cancel();
-                }
-            });
-            saveDialog.show();
-        } else if(view.getId()==R.id.load_btn) {
-            //load drawing
-            AlertDialog.Builder loadDialog = new AlertDialog.Builder(this);
-            loadDialog.setTitle(R.string.load_dialog_title);
-            loadDialog.setMessage(R.string.load_dialog_message);
-            loadDialog.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    Intent intent = new Intent(
-                            Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-
-                    startActivityForResult(intent, RESULT_LOAD_IMAGE);
-
-                }
-            });
-            loadDialog.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.cancel();
-                }
-            });
-            loadDialog.show();
-        }
     }
 
     @Override
@@ -345,6 +234,13 @@ public class Dnp extends Activity implements View.OnClickListener {
         }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu items for use in the action bar
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -353,9 +249,131 @@ public class Dnp extends Activity implements View.OnClickListener {
         if (mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
-        // Handle your other action bar items...
+        // Handle presses on the action bar items
+        switch (item.getItemId()) {
+            case R.id.new_btn:
+                newDrawing();
+                return true;
+            case R.id.save_btn:
+                saveDrawing();
+                return true;
+            case R.id.load_btn:
+                loadDrawing();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
-        return super.onOptionsItemSelected(item);
+    private void loadDrawing() {
+        //load drawing
+        AlertDialog.Builder loadDialog = new AlertDialog.Builder(this);
+        loadDialog.setTitle(R.string.load_dialog_title);
+        loadDialog.setMessage(R.string.load_dialog_message);
+        loadDialog.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Intent intent = new Intent(
+                        Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+
+                startActivityForResult(intent, RESULT_LOAD_IMAGE);
+
+            }
+        });
+        loadDialog.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        loadDialog.show();
+    }
+
+    private void saveDrawing() {
+        //save drawing
+        AlertDialog.Builder saveDialog = new AlertDialog.Builder(this);
+        saveDialog.setTitle(R.string.save_dialog_title);
+        saveDialog.setMessage(R.string.save_dialog_message);
+        saveDialog.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener(){
+            public void onClick(DialogInterface dialog, int which){
+                mDrawView.setDrawingCacheEnabled(true);
+
+                String dirPath = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separatorChar + "Pictures";
+                String fileTitle = UUID.randomUUID().toString();
+                String fileName = fileTitle + ".png";
+                File image = new File(dirPath, fileName);
+                Context applicationContext = getApplicationContext();
+                Assert.assertNotNull(applicationContext);
+                Bitmap drawingCache = mDrawView.getDrawingCache();
+                Assert.assertNotNull(drawingCache);
+                boolean error = false;
+                try {
+                    // Ensure the file has an unique name:
+                    while (!image.createNewFile()) {
+                        fileTitle = UUID.randomUUID().toString();
+                        fileName = fileTitle + ".png";
+                        image = new File(dirPath, fileName);
+                    }
+                    FileOutputStream fileOutputStream = new FileOutputStream(image);
+                    drawingCache.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream);
+                    fileOutputStream.flush();
+                    fileOutputStream.close();
+
+                    // Update content database:
+                    ContentValues values = new ContentValues(7);
+
+                    values.put(MediaStore.Images.Media.TITLE, "DNP-drawing-" + fileTitle);
+                    values.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
+                    values.put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis());
+                    values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+                    values.put(MediaStore.Images.Media.ORIENTATION, 0);
+                    values.put(MediaStore.Images.Media.DATA, image.getAbsolutePath());
+                    values.put(MediaStore.Images.Media.SIZE, image.length());
+
+                    getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    error = true;
+                }
+
+                if (error) {
+                    Toast unsavedToast = Toast.makeText(applicationContext,
+                            R.string.save_dialog_ko, Toast.LENGTH_SHORT);
+                    unsavedToast.show();
+                } else {
+                    Toast savedToast = Toast.makeText(applicationContext,
+                            R.string.save_dialog_ok, Toast.LENGTH_SHORT);
+                    savedToast.show();
+                }
+                mDrawView.destroyDrawingCache();
+            }
+        });
+        saveDialog.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener(){
+            public void onClick(DialogInterface dialog, int which){
+                dialog.cancel();
+            }
+        });
+        saveDialog.show();
+    }
+
+    private void newDrawing() {
+        //new button
+        AlertDialog.Builder newDialog = new AlertDialog.Builder(this);
+        newDialog.setTitle(R.string.new_dialog_title);
+        newDialog.setMessage(R.string.new_dialog_message);
+        newDialog.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                mDrawView.startNew();
+                dialog.dismiss();
+            }
+        });
+        newDialog.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener(){
+            public void onClick(DialogInterface dialog, int which){
+                dialog.cancel();
+            }
+        });
+        newDialog.show();
+
     }
 
 }
