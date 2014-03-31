@@ -223,7 +223,18 @@ public class DrawingView extends View {
         // Id of multiple touch event
         int id = MotionEventCompat.getPointerId(event, index);
 
-        float size = (event.getTouchMajor(index) + event.getTouchMinor(index)) / 2;
+
+        InputDevice device = event.getDevice();
+        Assert.assertNotNull(device);
+        InputDevice.MotionRange motionRangeMajor = device.getMotionRange(MotionEvent.AXIS_TOUCH_MAJOR);
+        InputDevice.MotionRange motionRangeMinor = device.getMotionRange(MotionEvent.AXIS_TOUCH_MINOR);
+        Assert.assertNotNull(motionRangeMajor);
+        Assert.assertNotNull(motionRangeMinor);
+        float touchMajorMax = motionRangeMajor.getMax();
+        float touchMinorMax = motionRangeMinor.getMax();
+
+
+        float size = (((event.getTouchMajor(index) / touchMajorMax) + (event.getTouchMinor(index) / touchMinorMax)) / 2) * 2700;
         float pressure = event.getPressure(index);
 
         switch (MotionEventCompat.getActionMasked(event)) {
