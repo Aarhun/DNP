@@ -37,18 +37,22 @@ public class DrawingView extends View {
 //            paint.setColor(mPaintColor);
 
             float size = 50;
-            while (mDrawPaths.size() > 1) {
+            for (int j = 0; j < mDrawPaths.size(); j++) {
                 float moveX = 0;
                 float moveY = 0;
                 float lineToX = 0;
                 float lineToY = 0;
 
-                float lastX1 = mDrawPaths.get(0).getLastX();
-                float lastY1 = mDrawPaths.get(0).getLastY();
-                float firstX1 = mDrawPaths.get(0).getFirstX();
-                float firstY1 = mDrawPaths.get(0).getFirstY();
+                float lastX1 = mDrawPaths.get(j).getLastX();
+                float lastY1 = mDrawPaths.get(j).getLastY();
+                float firstX1 = mDrawPaths.get(j).getFirstX();
+                float firstY1 = mDrawPaths.get(j).getFirstY();
                 double minimalDistance = 0;
-                for (int i = 1; i < mDrawPaths.size(); i++) {
+                // For each path extremity search nearest other path extremity:
+                for (int i = 0; i < mDrawPaths.size(); i++) {
+                    if ( i == j ) {
+                        continue;
+                    }
                     float lastX2 = mDrawPaths.get(i).getLastX();
                     float lastY2 = mDrawPaths.get(i).getLastY();
                     float firstX2 = mDrawPaths.get(i).getFirstX();
@@ -88,10 +92,10 @@ public class DrawingView extends View {
                         minimalDistance = distanceLast1Last2;
                     }
                 }
+                // For each path trace a line between nearest extremities found
                 path.moveTo(moveX, moveY);
                 path.lineTo(lineToX, lineToY);
-                paint.setStrokeWidth(50);
-                mDrawPaths.remove(0);
+                paint.setStrokeWidth(size);
             }
             mDrawCanvas.drawPath(path, paint);
             invalidate();
