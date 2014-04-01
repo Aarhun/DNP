@@ -9,6 +9,7 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
+import android.os.Handler;
 import android.support.v4.view.MotionEventCompat;
 import android.util.AttributeSet;
 import android.util.SparseArray;
@@ -21,7 +22,87 @@ import com.tacitus.dnp.R;
 
 import junit.framework.Assert;
 
+import java.util.ArrayList;
+
 public class DrawingView extends View {
+
+    private class DrawWatcher implements Runnable {
+        private ArrayList<DrawPath> mDrawPaths = new ArrayList<DrawPath>();
+
+        @Override
+        public void run() {
+            Path path = new Path();
+            Paint paint = createPaint();
+            paint.setColor(getResources().getColor(android.R.color.holo_blue_bright));
+//            paint.setColor(mPaintColor);
+
+            float size = 50;
+            while (mDrawPaths.size() > 1) {
+                float moveX = 0;
+                float moveY = 0;
+                float lineToX = 0;
+                float lineToY = 0;
+
+                float lastX1 = mDrawPaths.get(0).getLastX();
+                float lastY1 = mDrawPaths.get(0).getLastY();
+                float firstX1 = mDrawPaths.get(0).getFirstX();
+                float firstY1 = mDrawPaths.get(0).getFirstY();
+                double minimalDistance = 0;
+                for (int i = 1; i < mDrawPaths.size(); i++) {
+                    float lastX2 = mDrawPaths.get(i).getLastX();
+                    float lastY2 = mDrawPaths.get(i).getLastY();
+                    float firstX2 = mDrawPaths.get(i).getFirstX();
+                    float firstY2 = mDrawPaths.get(i).getFirstY();
+
+                    double distanceFirst1First2 = Math.sqrt((firstX1 - firstX2) * (firstX1 - firstX2) + (firstY1 - firstY2) * (firstY1 - firstY2));
+                    double distanceFirst1Last2 = Math.sqrt((firstX1 - lastX2) * (firstX1 - lastX2) + (firstY1 - lastY2) * (firstY1 - lastY2));
+                    double distanceFirst2Last1 = Math.sqrt((firstX2 - lastX1) * (firstX2 - lastX1) + (firstY2 - lastY1) * (firstY2 - lastY1));
+                    double distanceLast1Last2 = Math.sqrt((lastX1 - lastX2) * (lastX1 - lastX2) + (lastY1 - lastY2) * (lastY1 - lastY2));
+
+                    if (distanceFirst1First2 < minimalDistance || minimalDistance == 0) {
+                        moveX = firstX1;
+                        moveY = firstY1;
+                        lineToX = firstX2;
+                        lineToY = firstY2;
+                        minimalDistance = distanceFirst1First2;
+                    }
+                    if (distanceFirst1Last2 < minimalDistance) {
+                        moveX = firstX1;
+                        moveY = firstY1;
+                        lineToX = lastX2;
+                        lineToY = lastY2;
+                        minimalDistance = distanceFirst1Last2;
+                    }
+                    if (distanceFirst2Last1 < minimalDistance) {
+                        moveX = firstX2;
+                        moveY = firstY2;
+                        lineToX = lastX1;
+                        lineToY = lastY1;
+                        minimalDistance = distanceFirst2Last1;
+                    }
+                    if (distanceLast1Last2 < minimalDistance) {
+                        moveX = lastX1;
+                        moveY = lastY1;
+                        lineToX = lastX2;
+                        lineToY = lastY2;
+                        minimalDistance = distanceLast1Last2;
+                    }
+                }
+                path.moveTo(moveX, moveY);
+                path.lineTo(lineToX, lineToY);
+                paint.setStrokeWidth(50);
+                mDrawPaths.remove(0);
+            }
+            mDrawCanvas.drawPath(path, paint);
+            invalidate();
+            path.close();
+            mDrawPaths.clear();
+        }
+
+        public void addPath(DrawPath drawPath) {
+            mDrawPaths.add(drawPath);
+        }
+    }
 
     private class DrawPath {
         private Path mDrawPath;
@@ -30,13 +111,23 @@ public class DrawingView extends View {
         private float mSize;
         private float mSizeHollow;
         private float mPressure;
+        private long mLastEventTime;
+        private float mFirstX;
+        private float mFirstY;
+        private float mLastX;
+        private float mLastY;
 
-        private DrawPath(float size, float pressure) {
+        private DrawPath(float size, float pressure, long downTime) {
             mDrawPath = new Path();
             mDrawPaint = createPaint();
             mDrawPaint.setColor(mPaintColor);
             mSize = size;
+            mLastX = 0;
+            mLastY = 0;
+            mFirstX = 0;
+            mFirstY = 0;
             mPressure = pressure;
+            mLastEventTime = downTime;
             if (!mTouchSizeMode) {
                 mSize = mBrushSize;
             }
@@ -56,10 +147,16 @@ public class DrawingView extends View {
 
         public void moveTo(float x, float y) {
             mDrawPath.moveTo(x, y);
+            mLastX = x;
+            mLastY = y;
+            mFirstX = x;
+            mFirstY = y;
         }
 
         public void lineTo(float x, float y) {
             mDrawPath.lineTo(x, y);
+            mLastX = x;
+            mLastY = y;
         }
 
         public void drawCircle(float x, float y) {
@@ -67,7 +164,8 @@ public class DrawingView extends View {
             if (mHollowMode && !mEraseMode) {
                 mDrawCanvas.drawCircle(x, y, mSizeHollow / 2, mDrawPaintHollow);
             }
-
+            mLastX = x;
+            mLastY = y;
         }
 
         public void drawPath() {
@@ -82,8 +180,34 @@ public class DrawingView extends View {
             mDrawPath.close();
         }
 
+        public long getLastEventTime() {
+            return mLastEventTime;
+        }
+
+        public float getLastX() {
+            return mLastX;
+        }
+
+        public float getLastY() {
+            return mLastY;
+        }
+
+        public float getFirstX() {
+            return mFirstX;
+        }
+
+        public float getFirstY() {
+            return mFirstY;
+        }
+
+
+        public float getSize() {
+            return mSize;
+        }
     }
 
+    private DrawWatcher mDrawWatcher = new DrawWatcher();
+    private Handler mHandler;
     //drawing path & paint
     private SparseArray<DrawPath> mDrawPaths = new SparseArray<DrawPath>();
 
@@ -113,6 +237,12 @@ public class DrawingView extends View {
         Assert.assertNotNull(resources);
         mCanvasPaint = new Paint(Paint.DITHER_FLAG);
         setBrushSize(resources.getInteger(R.integer.initial_size) * 2);
+        mHandler = new Handler();
+//        scheduleTimer();
+    }
+
+    public void scheduleTimer() {
+        mHandler.postDelayed(mDrawWatcher, 1000);
     }
 
     private Paint createPaint() {
@@ -143,7 +273,46 @@ public class DrawingView extends View {
     }
 
     private void logEvent(MotionEvent event) {
+        String tag = "";
         int index = MotionEventCompat.getActionIndex(event);
+        switch (MotionEventCompat.getActionMasked(event)) {
+            case MotionEvent.ACTION_UP:
+                tag = "ACTION_UP";
+                break;
+            case MotionEvent.ACTION_CANCEL:
+                tag = "ACTION_CANCEL";
+                break;
+            case MotionEvent.ACTION_MOVE:
+                tag = "ACTION_MOVE";
+                break;
+            case MotionEvent.ACTION_DOWN:
+                tag = "ACTION_DOWN";
+                break;
+            case MotionEvent.ACTION_HOVER_ENTER:
+                tag = "ACTION_HOVER_ENTER";
+                break;
+            case MotionEvent.ACTION_HOVER_EXIT:
+                tag = "ACTION_HOVER_EXIT";
+                break;
+            case MotionEvent.ACTION_HOVER_MOVE:
+                tag = "ACTION_HOVER_MOVE";
+                break;
+            case MotionEvent.ACTION_OUTSIDE:
+                tag = "ACTION_OUTSIDE";
+                break;
+
+            case MotionEvent.ACTION_POINTER_DOWN:
+                tag = "ACTION_POINTER_DOWN";
+                break;
+            case MotionEvent.ACTION_POINTER_UP:
+                tag = "ACTION_POINTER_UP";
+                break;
+            case MotionEvent.ACTION_SCROLL:
+                tag = "ACTION_SCROLL";
+                break;
+        }
+        Log.e(tag, "-DOWN TIME: ", event.getDownTime());
+        Log.e(tag, "-EVENT TIME: ", event.getEventTime());
         for (InputDevice.MotionRange motionRange : event.getDevice().getMotionRanges()) {
             switch (motionRange.getAxis()) {
                 case MotionEvent.AXIS_X:
@@ -236,18 +405,21 @@ public class DrawingView extends View {
 
         float size = (((event.getTouchMajor(index) / touchMajorMax) + (event.getTouchMinor(index) / touchMinorMax)) / 2) * 2700;
         float pressure = event.getPressure(index);
-
         switch (MotionEventCompat.getActionMasked(event)) {
             case MotionEvent.ACTION_POINTER_DOWN:
             case MotionEvent.ACTION_DOWN:
 //                logEvent(event);
 
                 // Create path and draw a small line of 1 pixel:
-                DrawPath drawPath = new DrawPath(size, pressure);
+                DrawPath drawPath = new DrawPath(size, pressure, event.getDownTime());
                 drawPath.moveTo(touchX, touchY);
                 drawPath.lineTo(touchX - 1, touchY - 1);
                 drawPath.drawPath();
+                mDrawWatcher.addPath(drawPath);
                 mDrawPaths.put(id, drawPath);
+                if (MotionEventCompat.getActionMasked(event) == MotionEvent.ACTION_DOWN) {
+                    scheduleTimer();
+                }
                 break;
 
             case MotionEvent.ACTION_MOVE:
