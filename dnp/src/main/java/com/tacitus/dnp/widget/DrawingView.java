@@ -28,16 +28,21 @@ public class DrawingView extends View {
 
     private class DrawWatcher implements Runnable {
         private ArrayList<DrawPath> mDrawPaths = new ArrayList<DrawPath>();
+        private boolean running = false;
 
         @Override
         public void run() {
+            running = true;
             Path path = new Path();
             Paint paint = createPaint();
-            paint.setColor(getResources().getColor(android.R.color.holo_blue_bright));
-//            paint.setColor(mPaintColor);
+//            paint.setColor(getResources().getColor(android.R.color.holo_blue_bright));
+            paint.setColor(mPaintColor);
 
             float size = 50;
             for (int j = 0; j < mDrawPaths.size(); j++) {
+                if (!mDrawPaths.get(j).isTerminated()) {
+                    continue;
+                }
                 float moveX = 0;
                 float moveY = 0;
                 float lineToX = 0;
@@ -47,6 +52,7 @@ public class DrawingView extends View {
                 float lastY1 = mDrawPaths.get(j).getLastY();
                 float firstX1 = mDrawPaths.get(j).getFirstX();
                 float firstY1 = mDrawPaths.get(j).getFirstY();
+                size = mDrawPaths.get(j).getSize();
                 double minimalDistance = 0;
                 // For each path extremity search nearest other path extremity:
                 for (int i = 0; i < mDrawPaths.size(); i++) {
@@ -101,10 +107,13 @@ public class DrawingView extends View {
             invalidate();
             path.close();
             mDrawPaths.clear();
+            running = false;
         }
 
         public void addPath(DrawPath drawPath) {
-            mDrawPaths.add(drawPath);
+            if (!running) {
+                mDrawPaths.add(drawPath);
+            }
         }
     }
 
@@ -120,6 +129,7 @@ public class DrawingView extends View {
         private float mFirstY;
         private float mLastX;
         private float mLastY;
+        private boolean mTerminated;
 
         private DrawPath(float size, float pressure, long downTime) {
             mDrawPath = new Path();
@@ -132,6 +142,7 @@ public class DrawingView extends View {
             mFirstY = 0;
             mPressure = pressure;
             mLastEventTime = downTime;
+            mTerminated = false;
             if (!mTouchSizeMode) {
                 mSize = mBrushSize;
             }
@@ -181,6 +192,7 @@ public class DrawingView extends View {
         }
 
         public void closePath() {
+            mTerminated = true;
             mDrawPath.close();
         }
 
@@ -207,6 +219,10 @@ public class DrawingView extends View {
 
         public float getSize() {
             return mSize;
+        }
+
+        public boolean isTerminated() {
+            return mTerminated;
         }
     }
 
@@ -413,7 +429,6 @@ public class DrawingView extends View {
             case MotionEvent.ACTION_POINTER_DOWN:
             case MotionEvent.ACTION_DOWN:
 //                logEvent(event);
-
                 // Create path and draw a small line of 1 pixel:
                 DrawPath drawPath = new DrawPath(size, pressure, event.getDownTime());
                 drawPath.moveTo(touchX, touchY);
