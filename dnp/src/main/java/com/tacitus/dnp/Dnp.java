@@ -3,6 +3,7 @@ package com.tacitus.dnp;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -10,19 +11,22 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.view.MotionEventCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
@@ -49,6 +53,7 @@ public class Dnp extends Activity implements View.OnClickListener {
     private TextView mAlphaChooserTitle;
     private ActionBarDrawerToggle mDrawerToggle;
     private int RESULT_LOAD_IMAGE = 1;
+    private Dialog mColorChooserDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -227,8 +232,8 @@ public class Dnp extends Activity implements View.OnClickListener {
                     Bitmap bitmap = BitmapFactory.decodeFile(picturePath);
                     if (bitmap != null) {
                         mDrawView.loadImage(bitmap);
+                        bitmap.recycle();
                     }
-                    bitmap.recycle();
                 }
             }
         }
@@ -260,9 +265,107 @@ public class Dnp extends Activity implements View.OnClickListener {
             case R.id.load_btn:
                 loadDrawing();
                 return true;
+            case R.id.sun_btn:
+                displayDnpColorChooser();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+
+    private void displayDnpColorChooser() {
+        //display color chooser
+        final AlertDialog.Builder colorChooser = new AlertDialog.Builder(this);
+        View dialogView = getLayoutInflater().inflate(R.layout.dnp_color_chooser, null);
+        Assert.assertNotNull(dialogView);
+        colorChooser.setView(dialogView);
+        colorChooser.setTitle(R.string.color_chooser_dialog_title);
+//        colorChooser.setMessage(R.string.color_chooser_dialog_message);
+        final ImageView imageView = (ImageView) dialogView.findViewById(R.id.dnp_color_chooser);
+        Assert.assertNotNull(imageView);
+        imageView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                float touchX = MotionEventCompat.getX(event, MotionEventCompat.getActionIndex(event));
+                float touchY = MotionEventCompat.getY(event, MotionEventCompat.getActionIndex(event));
+
+                // Index of multiple touch event:
+                int index = MotionEventCompat.getActionIndex(event);
+                // Id of multiple touch event
+                int id = MotionEventCompat.getPointerId(event, index);
+
+                switch (MotionEventCompat.getActionMasked(event)) {
+                    case MotionEvent.ACTION_POINTER_DOWN:
+                    case MotionEvent.ACTION_DOWN:
+                        break;
+
+                    case MotionEvent.ACTION_MOVE:
+                        break;
+
+                    case MotionEvent.ACTION_CANCEL:
+                    case MotionEvent.ACTION_POINTER_UP:
+                    case MotionEvent.ACTION_UP:
+                        imageView.setDrawingCacheEnabled(true);
+                        Bitmap bitmap = Bitmap.createBitmap(imageView.getDrawingCache());
+                        imageView.setDrawingCacheEnabled(false);
+                        int pixel = bitmap.getPixel((int) touchX, (int) touchY);
+                        bitmap.recycle();
+                        int color = Color.argb(255, Color.red(pixel), Color.green(pixel), Color.blue(pixel));
+                        String stringColor = String.format("#%06X", 0xFFFFFF & color);
+                        switch (color) {
+                            case -14391260:
+                                setColor(stringColor, "dark green");
+                                break;
+                            case -13463502:
+                                setColor(stringColor, "green");
+                                break;
+                            case -12137658:
+                                setColor(stringColor, "light green");
+                                break;
+                            case -2675411:
+                                setColor(stringColor, "red");
+                                break;
+                            case -3837106:
+                                setColor(stringColor, "light brown");
+                                break;
+                            case -7515592:
+                                setColor(stringColor, "dark brown");
+                                break;
+                            case -13156710:
+                                setColor(stringColor, "blue");
+                                break;
+                            case -465067:
+                                setColor(stringColor, "yellow");
+                                break;
+                            case -4079167:
+                                setColor(stringColor, "grey");
+                                break;
+                            default:
+                                break;
+                        }
+
+
+                        break;
+
+                    default:
+                        // Do not consume other events.
+                        return false;
+                }
+                // Consume handled event.
+                return true;
+            }
+        });
+        mColorChooserDialog = colorChooser.create();
+        mColorChooserDialog.show();
+    }
+
+    private void setColor(String stringColor, String message) {
+        mDrawView.setColor(stringColor);
+        Toast colorToast = Toast.makeText(getApplicationContext(),
+                "Color: " + message, Toast.LENGTH_SHORT);
+        colorToast.show();
+        mColorChooserDialog.dismiss();
     }
 
     private void loadDrawing() {
