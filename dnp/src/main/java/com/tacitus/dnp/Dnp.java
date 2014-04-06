@@ -54,6 +54,17 @@ public class Dnp extends Activity implements View.OnClickListener {
     private ActionBarDrawerToggle mDrawerToggle;
     private int RESULT_LOAD_IMAGE = 1;
     private Dialog mColorChooserDialog;
+    private AlertDialog.Builder mColorChooser;
+
+    private static final int[] STATE_DARK_GREEN = {R.attr.state_dark_green};
+    private static final int[] STATE_GREEN = {R.attr.state_green};
+    private static final int[] STATE_LIGHT_GREEN = {R.attr.state_light_green};
+    private static final int[] STATE_RED = {R.attr.state_red};
+    private static final int[] STATE_LIGHT_BROWN = {R.attr.state_light_brown};
+    private static final int[] STATE_DARK_BROWN = {R.attr.state_dark_brown};
+    private static final int[] STATE_BLUE = {R.attr.state_blue};
+    private static final int[] STATE_YELLOW = {R.attr.state_yellow};
+    private static final int[] STATE_GREY = {R.attr.state_grey};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -151,6 +162,9 @@ public class Dnp extends Activity implements View.OnClickListener {
             }
         });
         mAlphaChooser.setProgress(getResources().getInteger(R.integer.initial_alpha));
+
+        mColorChooser = new AlertDialog.Builder(this);
+        initDnpColorChooser();
     }
 
     public void paintClickedToggle(View view) {
@@ -266,25 +280,23 @@ public class Dnp extends Activity implements View.OnClickListener {
                 loadDrawing();
                 return true;
             case R.id.sun_btn:
-                displayDnpColorChooser();
+                mColorChooserDialog.show();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-
-    private void displayDnpColorChooser() {
-        //display color chooser
-        final AlertDialog.Builder colorChooser = new AlertDialog.Builder(this);
+    private void initDnpColorChooser() {
         View dialogView = getLayoutInflater().inflate(R.layout.dnp_color_chooser, null);
         Assert.assertNotNull(dialogView);
-        colorChooser.setView(dialogView);
-        colorChooser.setTitle(R.string.color_chooser_dialog_title);
+        mColorChooser.setView(dialogView);
+        mColorChooser.setTitle(R.string.color_chooser_dialog_title);
 //        colorChooser.setMessage(R.string.color_chooser_dialog_message);
         final ImageView imageView = (ImageView) dialogView.findViewById(R.id.dnp_color_chooser);
+        final ImageView imageViewBackground = (ImageView) dialogView.findViewById(R.id.dnp_color_chooser_background);
         Assert.assertNotNull(imageView);
-        imageView.setOnTouchListener(new View.OnTouchListener() {
+        dialogView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 float touchX = MotionEventCompat.getX(event, MotionEventCompat.getActionIndex(event));
@@ -305,6 +317,7 @@ public class Dnp extends Activity implements View.OnClickListener {
 
                     case MotionEvent.ACTION_CANCEL:
                     case MotionEvent.ACTION_POINTER_UP:
+                        break;
                     case MotionEvent.ACTION_UP:
                         imageView.setDrawingCacheEnabled(true);
                         Bitmap bitmap = Bitmap.createBitmap(imageView.getDrawingCache());
@@ -315,31 +328,49 @@ public class Dnp extends Activity implements View.OnClickListener {
                         String stringColor = String.format("#%06X", 0xFFFFFF & color);
                         switch (color) {
                             case -14391260:
-                                setColor(stringColor, "dark green");
+                                // Dark green
+                                setColor(stringColor);
+                                imageViewBackground.setImageState(STATE_DARK_GREEN, false);
                                 break;
                             case -13463502:
-                                setColor(stringColor, "green");
+                                // Green
+                                setColor(stringColor);
+                                imageViewBackground.setImageState(STATE_GREEN, false);
                                 break;
                             case -12137658:
-                                setColor(stringColor, "light green");
+                                // Light green
+                                setColor(stringColor);
+                                imageViewBackground.setImageState(STATE_LIGHT_GREEN, false);
                                 break;
                             case -2675411:
-                                setColor(stringColor, "red");
+                                // Red
+                                setColor(stringColor);
+                                imageViewBackground.setImageState(STATE_RED, false);
                                 break;
                             case -3837106:
-                                setColor(stringColor, "light brown");
+                                // Light brown
+                                setColor(stringColor);
+                                imageViewBackground.setImageState(STATE_LIGHT_BROWN, false);
                                 break;
                             case -7515592:
-                                setColor(stringColor, "dark brown");
+                                // Dark brown
+                                setColor(stringColor);
+                                imageViewBackground.setImageState(STATE_DARK_BROWN, false);
                                 break;
                             case -13156710:
-                                setColor(stringColor, "blue");
+                                // Blue
+                                setColor(stringColor);
+                                imageViewBackground.setImageState(STATE_BLUE, false);
                                 break;
                             case -465067:
-                                setColor(stringColor, "yellow");
+                                // Yellow
+                                setColor(stringColor);
+                                imageViewBackground.setImageState(STATE_YELLOW, false);
                                 break;
                             case -4079167:
-                                setColor(stringColor, "grey");
+                                // Grey
+                                setColor(stringColor);
+                                imageViewBackground.setImageState(STATE_GREY, false);
                                 break;
                             default:
                                 break;
@@ -356,15 +387,11 @@ public class Dnp extends Activity implements View.OnClickListener {
                 return true;
             }
         });
-        mColorChooserDialog = colorChooser.create();
-        mColorChooserDialog.show();
+        mColorChooserDialog = mColorChooser.create();
     }
 
-    private void setColor(String stringColor, String message) {
+    private void setColor(String stringColor) {
         mDrawView.setColor(stringColor);
-        Toast colorToast = Toast.makeText(getApplicationContext(),
-                "Color: " + message, Toast.LENGTH_SHORT);
-        colorToast.show();
         mColorChooserDialog.dismiss();
     }
 

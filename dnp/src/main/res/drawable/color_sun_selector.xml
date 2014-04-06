@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<selector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:dnp="http://schemas.android.com/apk/res/com.tacitus.dnp">
+
+    <item dnp:state_dark_green="true"
+        android:drawable="@drawable/dark_green" />
+    <item dnp:state_green="true"
+        android:drawable="@drawable/green" />
+    <item dnp:state_light_green="true"
+        android:drawable="@drawable/light_green" />
+    <item dnp:state_red="true"
+        android:drawable="@drawable/red" />
+    <item dnp:state_light_brown="true"
+        android:drawable="@drawable/light_brown" />
+    <item dnp:state_dark_brown="true"
+        android:drawable="@drawable/dark_brown" />
+    <item dnp:state_blue="true"
+        android:drawable="@drawable/blue" />
+    <item dnp:state_yellow="true"
+        android:drawable="@drawable/yellow" />
+    <item dnp:state_grey="true"
+        android:drawable="@drawable/grey" />
+    <item
+        android:drawable="@drawable/dnp_sun_decorated" />
+</selector>

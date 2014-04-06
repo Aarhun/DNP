@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="sun_color_states">
+        <attr name="state_dark_green" format="boolean" />
+        <attr name="state_green" format="boolean" />
+        <attr name="state_light_green" format="boolean" />
+        <attr name="state_red" format="boolean" />
+        <attr name="state_light_brown" format="boolean" />
+        <attr name="state_dark_brown" format="boolean" />
+        <attr name="state_blue" format="boolean" />
+        <attr name="state_yellow" format="boolean" />
+        <attr name="state_grey" format="boolean" />
+    </declare-styleable>
+</resources>
