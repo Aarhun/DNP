@@ -296,6 +296,12 @@ public class Dnp extends Activity implements View.OnClickListener {
         final ImageView imageView = (ImageView) dialogView.findViewById(R.id.dnp_color_chooser);
         final ImageView imageViewBackground = (ImageView) dialogView.findViewById(R.id.dnp_color_chooser_background);
         Assert.assertNotNull(imageView);
+        mColorChooser.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener(){
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
         dialogView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -316,8 +322,8 @@ public class Dnp extends Activity implements View.OnClickListener {
                         break;
 
                     case MotionEvent.ACTION_CANCEL:
-                    case MotionEvent.ACTION_POINTER_UP:
                         break;
+                    case MotionEvent.ACTION_POINTER_UP:
                     case MotionEvent.ACTION_UP:
                         imageView.setDrawingCacheEnabled(true);
                         Bitmap bitmap = Bitmap.createBitmap(imageView.getDrawingCache());
@@ -329,47 +335,47 @@ public class Dnp extends Activity implements View.OnClickListener {
                         switch (color) {
                             case -14391260:
                                 // Dark green
-                                setColor(stringColor);
+                                chooseColor(stringColor, id);
                                 imageViewBackground.setImageState(STATE_DARK_GREEN, false);
                                 break;
                             case -13463502:
                                 // Green
-                                setColor(stringColor);
+                                chooseColor(stringColor, id);
                                 imageViewBackground.setImageState(STATE_GREEN, false);
                                 break;
                             case -12137658:
                                 // Light green
-                                setColor(stringColor);
+                                chooseColor(stringColor, id);
                                 imageViewBackground.setImageState(STATE_LIGHT_GREEN, false);
                                 break;
                             case -2675411:
                                 // Red
-                                setColor(stringColor);
+                                chooseColor(stringColor, id);
                                 imageViewBackground.setImageState(STATE_RED, false);
                                 break;
                             case -3837106:
                                 // Light brown
-                                setColor(stringColor);
+                                chooseColor(stringColor, id);
                                 imageViewBackground.setImageState(STATE_LIGHT_BROWN, false);
                                 break;
                             case -7515592:
                                 // Dark brown
-                                setColor(stringColor);
+                                chooseColor(stringColor, id);
                                 imageViewBackground.setImageState(STATE_DARK_BROWN, false);
                                 break;
                             case -13156710:
                                 // Blue
-                                setColor(stringColor);
+                                chooseColor(stringColor, id);
                                 imageViewBackground.setImageState(STATE_BLUE, false);
                                 break;
                             case -465067:
                                 // Yellow
-                                setColor(stringColor);
+                                chooseColor(stringColor, id);
                                 imageViewBackground.setImageState(STATE_YELLOW, false);
                                 break;
                             case -4079167:
                                 // Grey
-                                setColor(stringColor);
+                                chooseColor(stringColor, id);
                                 imageViewBackground.setImageState(STATE_GREY, false);
                                 break;
                             default:
@@ -390,9 +396,9 @@ public class Dnp extends Activity implements View.OnClickListener {
         mColorChooserDialog = mColorChooser.create();
     }
 
-    private void setColor(String stringColor) {
-        mDrawView.setColor(stringColor);
-        mColorChooserDialog.dismiss();
+    private void chooseColor(String stringColor, int id) {
+        mDrawView.setColor(stringColor, id);
+//        mColorChooserDialog.dismiss();
     }
 
     private void loadDrawing() {

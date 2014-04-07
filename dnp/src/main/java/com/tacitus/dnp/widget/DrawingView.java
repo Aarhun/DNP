@@ -54,6 +54,10 @@ public class DrawingView extends View {
             }
         }
 
+        public void setColor(int color) {
+            mDrawPaint.setColor(color);
+        }
+
         public void moveTo(float x, float y) {
             mDrawPath.moveTo(x, y);
         }
@@ -86,6 +90,7 @@ public class DrawingView extends View {
 
     //drawing path & paint
     private SparseArray<DrawPath> mDrawPaths = new SparseArray<DrawPath>();
+    private SparseArray<Integer> mDrawPaintColors = new SparseArray<Integer>();
 
     private final int HOLLOW_LINE_THICKNESS_RATIO = 20;
 
@@ -244,6 +249,10 @@ public class DrawingView extends View {
 
                 // Create path and draw a small line of 1 pixel:
                 DrawPath drawPath = new DrawPath(size, pressure);
+                Integer color = mDrawPaintColors.get(id);
+                if (color != null) {
+                    drawPath.setColor(color);
+                }
                 drawPath.moveTo(touchX, touchY);
                 drawPath.lineTo(touchX - 1, touchY - 1);
                 drawPath.drawPath();
@@ -285,8 +294,14 @@ public class DrawingView extends View {
 
     public void setColor(String newColor){
         //set color
-        invalidate();
+//        invalidate();
         mPaintColor = Color.parseColor(newColor);
+    }
+
+    public void setColor(String newColor, int id){
+        //set color
+//        invalidate();
+        mDrawPaintColors.put(id, Color.parseColor(newColor));
     }
 
     public void setBrushSize(float brushSize){
