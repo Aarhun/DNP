@@ -252,11 +252,11 @@ public class DrawingView extends View {
                 Integer color = mDrawPaintColors.get(id);
                 if (color != null) {
                     drawPath.setColor(color);
+                    drawPath.moveTo(touchX, touchY);
+                    drawPath.lineTo(touchX - 1, touchY - 1);
+                    drawPath.drawPath();
+                    mDrawPaths.put(id, drawPath);
                 }
-                drawPath.moveTo(touchX, touchY);
-                drawPath.lineTo(touchX - 1, touchY - 1);
-                drawPath.drawPath();
-                mDrawPaths.put(id, drawPath);
                 break;
 
             case MotionEvent.ACTION_MOVE:
@@ -303,6 +303,12 @@ public class DrawingView extends View {
 //        invalidate();
         mDrawPaintColors.put(id, Color.parseColor(newColor));
     }
+
+    public void clearColor(int id){
+        //clear color
+        mDrawPaintColors.remove(id);
+    }
+
 
     public void setBrushSize(float brushSize){
         //update size

@@ -3,7 +3,6 @@ package com.tacitus.dnp;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,22 +10,18 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.ActionBarDrawerToggle;
-import android.support.v4.view.MotionEventCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
@@ -34,6 +29,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.tacitus.dnp.widget.ColorChooserDialog;
 import com.tacitus.dnp.widget.DrawingView;
 
 import junit.framework.Assert;
@@ -42,7 +38,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.UUID;
 
-public class Dnp extends Activity implements View.OnClickListener {
+public class Dnp extends Activity implements View.OnClickListener, ColorChooserDialog.ColorChooser {
 
     private DrawingView mDrawView;
     private SeekBar mBrushSizeChooser;
@@ -53,18 +49,8 @@ public class Dnp extends Activity implements View.OnClickListener {
     private TextView mAlphaChooserTitle;
     private ActionBarDrawerToggle mDrawerToggle;
     private int RESULT_LOAD_IMAGE = 1;
-    private Dialog mColorChooserDialog;
-    private AlertDialog.Builder mColorChooser;
+    private ColorChooserDialog mColorChooserDialog;
 
-    private static final int[] STATE_DARK_GREEN = {R.attr.state_dark_green};
-    private static final int[] STATE_GREEN = {R.attr.state_green};
-    private static final int[] STATE_LIGHT_GREEN = {R.attr.state_light_green};
-    private static final int[] STATE_RED = {R.attr.state_red};
-    private static final int[] STATE_LIGHT_BROWN = {R.attr.state_light_brown};
-    private static final int[] STATE_DARK_BROWN = {R.attr.state_dark_brown};
-    private static final int[] STATE_BLUE = {R.attr.state_blue};
-    private static final int[] STATE_YELLOW = {R.attr.state_yellow};
-    private static final int[] STATE_GREY = {R.attr.state_grey};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -163,14 +149,16 @@ public class Dnp extends Activity implements View.OnClickListener {
         });
         mAlphaChooser.setProgress(getResources().getInteger(R.integer.initial_alpha));
 
-        mColorChooser = new AlertDialog.Builder(this);
-        initDnpColorChooser();
+        mColorChooserDialog = new ColorChooserDialog(this, this);
+
     }
 
     public void paintClickedToggle(View view) {
         String color = view.getTag().toString();
         mDrawView.setColor(color);
     }
+
+
 
 
     public void hollowClicked(View view) {
@@ -287,120 +275,6 @@ public class Dnp extends Activity implements View.OnClickListener {
         }
     }
 
-    private void initDnpColorChooser() {
-        View dialogView = getLayoutInflater().inflate(R.layout.dnp_color_chooser, null);
-        Assert.assertNotNull(dialogView);
-        mColorChooser.setView(dialogView);
-        mColorChooser.setTitle(R.string.color_chooser_dialog_title);
-//        colorChooser.setMessage(R.string.color_chooser_dialog_message);
-        final ImageView imageView = (ImageView) dialogView.findViewById(R.id.dnp_color_chooser);
-        final ImageView imageViewBackground = (ImageView) dialogView.findViewById(R.id.dnp_color_chooser_background);
-        Assert.assertNotNull(imageView);
-        mColorChooser.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener(){
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-        dialogView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                float touchX = MotionEventCompat.getX(event, MotionEventCompat.getActionIndex(event));
-                float touchY = MotionEventCompat.getY(event, MotionEventCompat.getActionIndex(event));
-
-                // Index of multiple touch event:
-                int index = MotionEventCompat.getActionIndex(event);
-                // Id of multiple touch event
-                int id = MotionEventCompat.getPointerId(event, index);
-
-                switch (MotionEventCompat.getActionMasked(event)) {
-                    case MotionEvent.ACTION_POINTER_DOWN:
-                    case MotionEvent.ACTION_DOWN:
-                        break;
-
-                    case MotionEvent.ACTION_MOVE:
-                        break;
-
-                    case MotionEvent.ACTION_CANCEL:
-                        break;
-                    case MotionEvent.ACTION_POINTER_UP:
-                    case MotionEvent.ACTION_UP:
-                        imageView.setDrawingCacheEnabled(true);
-                        Bitmap bitmap = Bitmap.createBitmap(imageView.getDrawingCache());
-                        imageView.setDrawingCacheEnabled(false);
-                        int pixel = bitmap.getPixel((int) touchX, (int) touchY);
-                        bitmap.recycle();
-                        int color = Color.argb(255, Color.red(pixel), Color.green(pixel), Color.blue(pixel));
-                        String stringColor = String.format("#%06X", 0xFFFFFF & color);
-                        switch (color) {
-                            case -14391260:
-                                // Dark green
-                                chooseColor(stringColor, id);
-                                imageViewBackground.setImageState(STATE_DARK_GREEN, false);
-                                break;
-                            case -13463502:
-                                // Green
-                                chooseColor(stringColor, id);
-                                imageViewBackground.setImageState(STATE_GREEN, false);
-                                break;
-                            case -12137658:
-                                // Light green
-                                chooseColor(stringColor, id);
-                                imageViewBackground.setImageState(STATE_LIGHT_GREEN, false);
-                                break;
-                            case -2675411:
-                                // Red
-                                chooseColor(stringColor, id);
-                                imageViewBackground.setImageState(STATE_RED, false);
-                                break;
-                            case -3837106:
-                                // Light brown
-                                chooseColor(stringColor, id);
-                                imageViewBackground.setImageState(STATE_LIGHT_BROWN, false);
-                                break;
-                            case -7515592:
-                                // Dark brown
-                                chooseColor(stringColor, id);
-                                imageViewBackground.setImageState(STATE_DARK_BROWN, false);
-                                break;
-                            case -13156710:
-                                // Blue
-                                chooseColor(stringColor, id);
-                                imageViewBackground.setImageState(STATE_BLUE, false);
-                                break;
-                            case -465067:
-                                // Yellow
-                                chooseColor(stringColor, id);
-                                imageViewBackground.setImageState(STATE_YELLOW, false);
-                                break;
-                            case -4079167:
-                                // Grey
-                                chooseColor(stringColor, id);
-                                imageViewBackground.setImageState(STATE_GREY, false);
-                                break;
-                            default:
-                                break;
-                        }
-
-
-                        break;
-
-                    default:
-                        // Do not consume other events.
-                        return false;
-                }
-                // Consume handled event.
-                return true;
-            }
-        });
-        mColorChooserDialog = mColorChooser.create();
-    }
-
-    private void chooseColor(String stringColor, int id) {
-        mDrawView.setColor(stringColor, id);
-//        mColorChooserDialog.dismiss();
-    }
-
     private void loadDrawing() {
         //load drawing
         AlertDialog.Builder loadDialog = new AlertDialog.Builder(this);
@@ -512,4 +386,13 @@ public class Dnp extends Activity implements View.OnClickListener {
 
     }
 
+    @Override
+    public void onChangeColor(String stringColor, int id) {
+        mDrawView.setColor(stringColor, id);
+    }
+
+    @Override
+    public void onClearColor(int id) {
+        mDrawView.clearColor(id);
+    }
 }

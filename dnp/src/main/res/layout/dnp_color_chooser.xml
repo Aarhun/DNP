@@ -1,30 +1,207 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+ <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="wrap_content"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
-
-    <ImageView
-        android:id="@+id/dnp_color_chooser_background"
-        android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_gravity="center">
+    <RelativeLayout
+        android:id="@+id/dnp_color_chooser_layout"
+        android:orientation="vertical"
         android:layout_width="wrap_content"
-        android:layout_gravity="center"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
-        android:src="@drawable/color_sun_selector"/>
+        android:background="@android:color/background_dark">
 
-    <ImageView
-        android:id="@+id/dnp_color_chooser"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
+        <ImageView
+            android:id="@+id/dnp_color_chooser_background"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_gravity="center"
+            android:src="@drawable/dnp_sun_decorated"/>
+
+        <ImageView
+            android:id="@+id/dnp_color_chooser"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_gravity="center"
+            android:src="@drawable/dnp_sun"
+            android:visibility="invisible"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/dnp_color_indicator_layout"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/tools_height"
         android:layout_gravity="center"
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp"
-        android:src="@drawable/dnp_sun"
-        android:visibility="invisible"/>
+        android:layout_weight="1"
+        >
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:orientation="horizontal" >
+
+            <ImageView
+                android:id="@+id/dnp_color_indicator_0"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="2dp"
+                android:layout_weight="1"
+                android:background="@android:color/background_light"/>
+            <ImageView
+                android:id="@+id/dnp_color_indicator_1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="2dp"
+                android:layout_weight="1"
+                android:background="@android:color/background_light"/>
+            <ImageView
+                android:id="@+id/dnp_color_indicator_2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="2dp"
+                android:layout_weight="1"
+                android:background="@android:color/background_light"/>
+            <ImageView
+                android:id="@+id/dnp_color_indicator_3"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="2dp"
+                android:layout_weight="1"
+                android:background="@android:color/background_light"/>
+            <ImageView
+                android:id="@+id/dnp_color_indicator_4"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="2dp"
+                android:layout_weight="1"
+                android:background="@android:color/background_light"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:orientation="horizontal" >
 
 
+            <RadioGroup android:id="@+id/dnp_color_selector"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:layout_weight="1"
+                >
+                <RadioButton
+                    android:id="@+id/dnp_color_selector_0"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="2dp"
+                    android:background="@drawable/color_selector"
+                    android:contentDescription="@string/paint"
+                    android:button="@null"
+                    android:layout_weight="1"
+                    android:tag="0"
+                    android:checked="true"/>
 
+                <RadioButton
+                    android:id="@+id/dnp_color_selector_1"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="2dp"
+                    android:background="@drawable/color_selector"
+                    android:contentDescription="@string/paint"
+                    android:button="@null"
+                    android:tag="1"
+                    android:layout_weight="1"/>
 
-</RelativeLayout>
+                <RadioButton
+                    android:id="@+id/dnp_color_selector_2"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="2dp"
+                    android:background="@drawable/color_selector"
+                    android:contentDescription="@string/paint"
+                    android:button="@null"
+                    android:tag="2"
+                    android:layout_weight="1" />
+
+                <RadioButton
+                    android:id="@+id/dnp_color_selector_3"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="2dp"
+                    android:background="@drawable/color_selector"
+                    android:contentDescription="@string/paint"
+                    android:button="@null"
+                    android:tag="3"
+                    android:layout_weight="1"/>
+
+                <RadioButton
+                    android:id="@+id/dnp_color_selector_4"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="2dp"
+                    android:background="@drawable/color_selector"
+                    android:contentDescription="@string/paint"
+                    android:button="@null"
+                    android:tag="4"
+                    android:layout_weight="1"/>
+
+            </RadioGroup>
+        </LinearLayout>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/dnp_color_button_layout"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/tools_height"
+        android:layout_weight="1"
+        >
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dip"
+            android:layout_marginLeft="4dip"
+            android:layout_marginRight="4dip"
+            android:background="?android:attr/dividerVertical"
+            android:layout_alignParentTop="true"
+            />
+        <View
+            android:id="@+id/button_separator"
+            android:layout_width="1dip"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="4dip"
+            android:layout_marginTop="4dip"
+            android:background="?android:attr/dividerVertical"
+            android:layout_centerHorizontal="true"/>
+
+        <Button
+            android:id="@+id/clear_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_toLeftOf="@id/button_separator"
+            android:background="?android:attr/selectableItemBackground"
+            android:text="@string/clear_color"
+            android:layout_alignParentBottom="true"
+            />
+
+        <Button
+            android:id="@+id/positive_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@id/button_separator"
+            android:background="?android:attr/selectableItemBackground"
+            android:text="@android:string/ok"
+            android:layout_alignParentBottom="true"
+            />
+    </RelativeLayout>
+
+</LinearLayout>
