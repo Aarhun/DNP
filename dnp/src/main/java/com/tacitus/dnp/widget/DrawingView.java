@@ -258,9 +258,11 @@ public class DrawingView extends View {
                     drawPath.drawPath();
                     mDrawPaths.put(id, drawPath);
                 } else {
-                    Toast noColorChoosen = Toast.makeText(getContext(),
+                    Context context = getContext();
+                    Assert.assertNotNull(context);
+                    Toast noColorChosen = Toast.makeText(context,
                             R.string.no_color_chosen, Toast.LENGTH_SHORT);
-                    noColorChoosen.show();
+                    noColorChosen.show();
                 }
                 break;
 
