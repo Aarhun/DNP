@@ -16,14 +16,10 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
-import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.RadioGroup;
-import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -56,23 +52,6 @@ public class Dnp extends Activity implements View.OnClickListener, ColorChooserD
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dnp);
-
-        // Used to set height of color chooser dynamically
-        RadioGroup radioGroupColor = (RadioGroup) findViewById(R.id.toggleGroup);
-        RelativeLayout colorChooser = (RelativeLayout) findViewById(R.id.color_chooser);
-        DisplayMetrics metrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(metrics);
-
-        colorChooser.measure(View.MeasureSpec.makeMeasureSpec(metrics.widthPixels, View.MeasureSpec.AT_MOST),
-                View.MeasureSpec.makeMeasureSpec(metrics.heightPixels, View.MeasureSpec.AT_MOST));
-        int realWidth = colorChooser.getMeasuredWidth();
-
-        ViewGroup.LayoutParams layoutParams = colorChooser.getLayoutParams();
-        Assert.assertNotNull(layoutParams);
-        layoutParams.height = realWidth / radioGroupColor.getChildCount();
-        colorChooser.setLayoutParams(layoutParams);
-        colorChooser.invalidate();
-        //----------------------------------------
 
         // Initialize the drawer menu
         DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -152,13 +131,6 @@ public class Dnp extends Activity implements View.OnClickListener, ColorChooserD
         mColorChooserDialog = new ColorChooserDialog(this, this);
 
     }
-
-    public void paintClickedToggle(View view) {
-        String color = view.getTag().toString();
-        mDrawView.setColor(color);
-    }
-
-
 
 
     public void hollowClicked(View view) {
@@ -267,7 +239,7 @@ public class Dnp extends Activity implements View.OnClickListener, ColorChooserD
             case R.id.load_btn:
                 loadDrawing();
                 return true;
-            case R.id.sun_btn:
+            case R.id.choose_color_btn:
                 mColorChooserDialog.show();
                 return true;
             default:

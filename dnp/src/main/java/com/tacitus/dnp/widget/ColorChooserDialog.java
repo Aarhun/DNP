@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
+import android.widget.ToggleButton;
 
 import com.tacitus.dnp.R;
 
@@ -31,13 +32,24 @@ public class ColorChooserDialog extends Dialog implements View.OnClickListener {
     private ColorChooser mListener;
     private Button mPositiveButton;
     private Button mClearButton;
+    private ToggleButton mTypeButton;
+    private ImageView mColorChooserBackground;
+    private ImageView mColorChooser;
+    private boolean mIsDnp = false;
 
     public ColorChooserDialog(Context context, ColorChooser listener) {
         super(context);
         mListener = listener;
-        final View dialogView = getLayoutInflater().inflate(R.layout.dnp_color_chooser, null);
-        final View chooserLayout = dialogView.findViewById(R.id.dnp_color_chooser_layout);
-        final RadioGroup radioGroup = (RadioGroup) dialogView.findViewById(R.id.dnp_color_selector);
+        final View dialogView = getLayoutInflater().inflate(R.layout.color_chooser, null);
+        final View chooserLayout = dialogView.findViewById(R.id.color_chooser_layout);
+        final RadioGroup radioGroup = (RadioGroup) dialogView.findViewById(R.id.color_selector);
+
+        mColorChooserBackground = (ImageView) dialogView.findViewById(R.id.color_chooser_background);
+        mColorChooser = (ImageView) dialogView.findViewById(R.id.color_chooser);
+
+        mColorChooserBackground.setImageResource(R.drawable.standard_color_chooser);
+        mColorChooser.setImageResource(R.drawable.standard_color_chooser);
+
 
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
@@ -51,7 +63,7 @@ public class ColorChooserDialog extends Dialog implements View.OnClickListener {
         setContentView(dialogView);
         setTitle(R.string.color_chooser_dialog_title);
         //        setMessage(R.string.color_chooser_dialog_message);
-        final ImageView imageView = (ImageView) dialogView.findViewById(R.id.dnp_color_chooser);
+        final ImageView imageView = (ImageView) dialogView.findViewById(R.id.color_chooser);
         Assert.assertNotNull(imageView);
         mPositiveButton = (Button) dialogView.findViewById(R.id.positive_button);
         mPositiveButton.setText(context.getText(android.R.string.ok));
@@ -61,6 +73,8 @@ public class ColorChooserDialog extends Dialog implements View.OnClickListener {
         mClearButton.setText(context.getText(R.string.clear_color));
         mClearButton.setOnClickListener(this);
 
+        mTypeButton = (ToggleButton) dialogView.findViewById(R.id.type_button);
+        mTypeButton.setOnClickListener(this);
 
 
         chooserLayout.setOnTouchListener(new View.OnTouchListener() {
@@ -77,6 +91,7 @@ public class ColorChooserDialog extends Dialog implements View.OnClickListener {
                 switch (MotionEventCompat.getActionMasked(event)) {
                     case MotionEvent.ACTION_POINTER_DOWN:
                         break;
+                    case MotionEvent.ACTION_MOVE:
                     case MotionEvent.ACTION_DOWN:
                         imageView.setDrawingCacheEnabled(true);
                         Bitmap bitmap = Bitmap.createBitmap(imageView.getDrawingCache());
@@ -86,34 +101,37 @@ public class ColorChooserDialog extends Dialog implements View.OnClickListener {
                             bitmap.recycle();
                             int color = Color.argb(255, Color.red(pixel), Color.green(pixel), Color.blue(pixel));
                             String stringColor = String.format("#%06X", 0xFFFFFF & color);
-                            switch (color) {
-                                case -14391260:
-                                    // Dark green
-                                case -13463502:
-                                    // Green
-                                case -12137658:
-                                    // Light green
-                                case -2675411:
-                                    // Red
-                                case -3837106:
-                                    // Light brown
-                                case -7515592:
-                                    // Dark brown
-                                case -13156710:
-                                    // Blue
-                                case -465067:
-                                    // Yellow
-                                case -4079167:
-                                    // Grey
-                                    setIndicatorBackgroundColor(color, mCurrentColorNumber);
-                                    mListener.onChangeColor(stringColor, mCurrentColorNumber);
-                                    break;
+                            // Limit possible color for dnp sun:
+                            if (mIsDnp) {
+                                switch (color) {
+                                    case -14391260:
+                                        // Dark green
+                                    case -13463502:
+                                        // Green
+                                    case -12137658:
+                                        // Light green
+                                    case -2675411:
+                                        // Red
+                                    case -3837106:
+                                        // Light brown
+                                    case -7515592:
+                                        // Dark brown
+                                    case -13156710:
+                                        // Blue
+                                    case -465067:
+                                        // Yellow
+                                    case -4079167:
+                                        // Grey
+                                        setIndicatorBackgroundColor(color, mCurrentColorNumber);
+                                        mListener.onChangeColor(stringColor, mCurrentColorNumber);
+                                        break;
+                                }
+                            } else {
+                                setIndicatorBackgroundColor(color, mCurrentColorNumber);
+                                mListener.onChangeColor(stringColor, mCurrentColorNumber);
                             }
                         } catch (IllegalArgumentException e) {
                         }
-                        break;
-
-                    case MotionEvent.ACTION_MOVE:
                         break;
 
                     case MotionEvent.ACTION_CANCEL:
@@ -139,6 +157,17 @@ public class ColorChooserDialog extends Dialog implements View.OnClickListener {
         } else if (v == mClearButton) {
             setIndicatorBackgroundColor(getContext().getResources().getColor(android.R.color.background_light), mCurrentColorNumber);
             mListener.onClearColor(mCurrentColorNumber);
+        } else if (v == mTypeButton) {
+            boolean on = ((ToggleButton) v).isChecked();
+            if (on) {
+                mColorChooserBackground.setImageResource(R.drawable.dnp_sun_color_chooser_background);
+                mColorChooser.setImageResource(R.drawable.dnp_sun_color_chooser);
+                mIsDnp = true;
+            } else {
+                mColorChooserBackground.setImageResource(R.drawable.standard_color_chooser);
+                mColorChooser.setImageResource(R.drawable.standard_color_chooser);
+                mIsDnp = false;
+            }
         }
 
     }
@@ -148,7 +177,7 @@ public class ColorChooserDialog extends Dialog implements View.OnClickListener {
     public void show() {
         super.show();
         // Used to set height of color indicator dynamically
-        RelativeLayout indicatorLayout = (RelativeLayout) findViewById(R.id.dnp_color_indicator_layout);
+        RelativeLayout indicatorLayout = (RelativeLayout) findViewById(R.id.color_indicator_layout);
 
         DisplayMetrics metrics = new DisplayMetrics();
         getWindow().getWindowManager().getDefaultDisplay().getMetrics(metrics);
@@ -169,19 +198,19 @@ public class ColorChooserDialog extends Dialog implements View.OnClickListener {
         ImageView imageView = null;
         switch (id) {
             case 0:
-                imageView = (ImageView) findViewById(R.id.dnp_color_indicator_0);
+                imageView = (ImageView) findViewById(R.id.color_indicator_0);
                 break;
             case 1:
-                imageView = (ImageView) findViewById(R.id.dnp_color_indicator_1);
+                imageView = (ImageView) findViewById(R.id.color_indicator_1);
                 break;
             case 2:
-                imageView = (ImageView) findViewById(R.id.dnp_color_indicator_2);
+                imageView = (ImageView) findViewById(R.id.color_indicator_2);
                 break;
             case 3:
-                imageView = (ImageView) findViewById(R.id.dnp_color_indicator_3);
+                imageView = (ImageView) findViewById(R.id.color_indicator_3);
                 break;
             case 4:
-                imageView = (ImageView) findViewById(R.id.dnp_color_indicator_4);
+                imageView = (ImageView) findViewById(R.id.color_indicator_4);
                 break;
         }
         if (imageView != null) {

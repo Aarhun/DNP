@@ -8,7 +8,8 @@
     <string name="erase">Erase</string>
     <string name="save">Save</string>
     <string name="load">Load</string>
-    <string name="sun">Choose color</string>
+    <string name="choose_color">Choose color</string>
+    <string name="dnp_sun">DNP SUN</string>
     <string name="paint">Paint</string>
     <string name="hollow_text">Hollow mode:</string>
     <string name="touch_size_text">Touch size mode:</string>

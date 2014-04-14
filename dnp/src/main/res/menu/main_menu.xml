@@ -22,8 +22,8 @@
         android:showAsAction="ifRoom"/>
 
     <item
-        android:id="@+id/sun_btn"
-        android:title="@string/sun"
+        android:id="@+id/choose_color_btn"
+        android:title="@string/choose_color"
         android:icon="@android:drawable/ic_menu_compass"
         android:showAsAction="ifRoom"/>
 </menu>
