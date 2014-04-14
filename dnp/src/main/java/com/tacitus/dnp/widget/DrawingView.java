@@ -15,6 +15,7 @@ import android.util.SparseArray;
 import android.view.InputDevice;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 import com.tacitus.dnp.Log;
 import com.tacitus.dnp.R;
@@ -249,13 +250,17 @@ public class DrawingView extends View {
 
                 // Create path and draw a small line of 1 pixel:
                 DrawPath drawPath = new DrawPath(size, pressure);
-                Integer color = mDrawPaintColors.get(id);
+                Integer color = getColor(id);
                 if (color != null) {
                     drawPath.setColor(color);
                     drawPath.moveTo(touchX, touchY);
                     drawPath.lineTo(touchX - 1, touchY - 1);
                     drawPath.drawPath();
                     mDrawPaths.put(id, drawPath);
+                } else {
+                    Toast noColorChoosen = Toast.makeText(getContext(),
+                            R.string.no_color_chosen, Toast.LENGTH_SHORT);
+                    noColorChoosen.show();
                 }
                 break;
 
@@ -291,6 +296,18 @@ public class DrawingView extends View {
         // Consume handled event.
         return true;
     }
+
+    private Integer getColor(int id) {
+        Integer color;
+        for (int i = id; i >= 0; i--) {
+            color = mDrawPaintColors.get(i);
+            if (color != null) {
+                return color;
+            }
+        }
+        return null;
+    }
+
 
     public void setColor(String newColor){
         //set color

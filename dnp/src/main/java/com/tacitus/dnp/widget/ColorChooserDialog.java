@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.support.v4.view.MotionEventCompat;
 import android.util.DisplayMetrics;
+import android.util.SparseArray;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +29,7 @@ public class ColorChooserDialog extends Dialog implements View.OnClickListener {
         void onClearColor(int id);
     }
 
+    private static int INDICATOR_NUMBER = 5;
     private Integer mCurrentColorNumber = 0;
     private ColorChooser mListener;
     private Button mPositiveButton;
@@ -36,6 +38,7 @@ public class ColorChooserDialog extends Dialog implements View.OnClickListener {
     private ImageView mColorChooserBackground;
     private ImageView mColorChooser;
     private boolean mIsDnp = false;
+    private SparseArray<Boolean> mColorDefined = new SparseArray<Boolean>();
 
     public ColorChooserDialog(Context context, ColorChooser listener) {
         super(context);
@@ -122,13 +125,11 @@ public class ColorChooserDialog extends Dialog implements View.OnClickListener {
                                         // Yellow
                                     case -4079167:
                                         // Grey
-                                        setIndicatorBackgroundColor(color, mCurrentColorNumber);
-                                        mListener.onChangeColor(stringColor, mCurrentColorNumber);
+                                        setColor(stringColor, color);
                                         break;
                                 }
                             } else {
-                                setIndicatorBackgroundColor(color, mCurrentColorNumber);
-                                mListener.onChangeColor(stringColor, mCurrentColorNumber);
+                                setColor(stringColor, color);
                             }
                         } catch (IllegalArgumentException e) {
                         }
@@ -155,8 +156,11 @@ public class ColorChooserDialog extends Dialog implements View.OnClickListener {
         if (v == mPositiveButton) {
             dismiss();
         } else if (v == mClearButton) {
-            setIndicatorBackgroundColor(getContext().getResources().getColor(android.R.color.background_light), mCurrentColorNumber);
-            mListener.onClearColor(mCurrentColorNumber);
+            for (int i = 0; i < INDICATOR_NUMBER; i++) {
+                setIndicatorBackgroundColor(getContext().getResources().getColor(android.R.color.background_light), i);
+                mListener.onClearColor(i);
+                mColorDefined.clear();
+            }
         } else if (v == mTypeButton) {
             boolean on = ((ToggleButton) v).isChecked();
             if (on) {
@@ -194,28 +198,48 @@ public class ColorChooserDialog extends Dialog implements View.OnClickListener {
         //----------------------------------------
     }
 
-    private void setIndicatorBackgroundColor(int color, int id) {
-        ImageView imageView = null;
+    private ImageView getImageView(int id) {
         switch (id) {
             case 0:
-                imageView = (ImageView) findViewById(R.id.color_indicator_0);
-                break;
+                return (ImageView) findViewById(R.id.color_indicator_0);
             case 1:
-                imageView = (ImageView) findViewById(R.id.color_indicator_1);
-                break;
+                return (ImageView) findViewById(R.id.color_indicator_1);
             case 2:
-                imageView = (ImageView) findViewById(R.id.color_indicator_2);
-                break;
+                return (ImageView) findViewById(R.id.color_indicator_2);
             case 3:
-                imageView = (ImageView) findViewById(R.id.color_indicator_3);
-                break;
+                return (ImageView) findViewById(R.id.color_indicator_3);
             case 4:
-                imageView = (ImageView) findViewById(R.id.color_indicator_4);
-                break;
+                return (ImageView) findViewById(R.id.color_indicator_4);
+            default:
+                return null;
         }
+    }
+
+    private void setIndicatorBackgroundColor(int color, int id) {
+        ImageView imageView = getImageView(id);
         if (imageView != null) {
             imageView.setBackgroundColor(color);
             imageView.invalidate();
         }
+    }
+
+    private void setColor(String stringColor, int color) {
+        if (mColorDefined.size() == 0) {
+            for (int i = 0; i < INDICATOR_NUMBER; i++) {
+                setIndicatorBackgroundColor(color, i);
+                mListener.onChangeColor(stringColor, i);
+            }
+        } else {
+            for (int i = mCurrentColorNumber + 1; i < INDICATOR_NUMBER; i++) {
+                if (mColorDefined.get(i) == null) {
+                    setIndicatorBackgroundColor(color, i);
+                    mListener.onChangeColor(stringColor, i);
+                }
+            }
+
+            setIndicatorBackgroundColor(color, mCurrentColorNumber);
+            mListener.onChangeColor(stringColor, mCurrentColorNumber);
+        }
+        mColorDefined.put(mCurrentColorNumber, true);
     }
 }

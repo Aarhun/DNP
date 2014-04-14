@@ -27,6 +27,7 @@
     <string name="color_chooser_dialog_message">Choose a color:</string>
     <string name="save_dialog_ok">Drawing saved to Gallery!</string>
     <string name="save_dialog_ko">Oops! Image could not be saved.</string>
+    <string name="no_color_chosen">No color chosen, press top right button.</string>
     <string name="clear_color">CLEAR</string>
     <string name="sml">Small</string>
     <string name="med">Medium</string>
