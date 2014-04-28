@@ -104,12 +104,14 @@ public class DrawingView extends View {
     private boolean mTouchSizeMode = true;
     private boolean mEraseMode = false;
     private boolean mPressureMode = false;
+    private boolean mOldTabletMode = false;
 
 
     //canvas bitmap
     private Bitmap mCanvasBitmap;
 
     private float mBrushSize;
+    private float mBrushSizeOldTablet;
 
     private int mPaintAlpha;
 
@@ -239,8 +241,11 @@ public class DrawingView extends View {
         float touchMajorMax = motionRangeMajor.getMax();
         float touchMinorMax = motionRangeMinor.getMax();
 
-
-        float size = (((event.getTouchMajor(index) / touchMajorMax) + (event.getTouchMinor(index) / touchMinorMax)) / 2) * 2700;
+        float multiplier = 2700;
+        if (mOldTabletMode) {
+            multiplier *= mBrushSizeOldTablet;
+        }
+        float size = (((event.getTouchMajor(index) / touchMajorMax) + (event.getTouchMinor(index) / touchMinorMax)) / 2) * multiplier;
         float pressure = event.getPressure(index);
 
         switch (MotionEventCompat.getActionMasked(event)) {
@@ -365,4 +370,14 @@ public class DrawingView extends View {
         mDrawCanvas.drawBitmap(bitmap, 0, 0, null);
         invalidate();
     }
+
+    public void setBrushSizeOldTablet(float brushSizeOldTablet){
+        //update size for old tablet
+        mBrushSizeOldTablet = brushSizeOldTablet;
+    }
+
+    public void setOldTabletMode(boolean oldTabletMode) {
+        mOldTabletMode = oldTabletMode;
+    }
+
 }

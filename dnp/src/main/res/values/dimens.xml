@@ -12,6 +12,7 @@
 
     <!-- Brush sizes -->
     <integer name="initial_size">50</integer>
+    <integer name="initial_size_old_tablet">8</integer>
 
 
     <integer name="initial_alpha">255</integer>

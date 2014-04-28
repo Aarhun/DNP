@@ -34,5 +34,7 @@
     <string name="lrg">Large</string>
     <string name="drawer_open">Open</string>
     <string name="drawer_close">Close</string>
+    <string name="brush_size_old_tablet">Brush size (old tablet):</string>
+    <string name="old_tablet_mode">Old tablet mode:</string>
 
 </resources>

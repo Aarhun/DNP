@@ -36,6 +36,9 @@ import java.util.UUID;
 
 public class Dnp extends Activity implements View.OnClickListener, ColorChooserDialog.ColorChooser {
 
+    private SeekBar mBrushSizeChooserOldTablet;
+    private TextView mBrushSizeChooserTextOldTablet;
+    private TextView mBrushSizeChooserTitleOldTablet;
     private DrawingView mDrawView;
     private SeekBar mBrushSizeChooser;
     private TextView mBrushSizeChooserText;
@@ -103,6 +106,31 @@ public class Dnp extends Activity implements View.OnClickListener, ColorChooserD
             }
         });
         mBrushSizeChooser.setProgress(getResources().getInteger(R.integer.initial_size));
+
+        mBrushSizeChooserTextOldTablet = (TextView)findViewById(R.id.brush_size_chooser_text_old_tablet);
+        mBrushSizeChooserTitleOldTablet = (TextView)findViewById(R.id.brush_size_chooser_title_old_tablet);
+        mBrushSizeChooserTextOldTablet.setTextColor(getResources().getColor(android.R.color.darker_gray));
+        mBrushSizeChooserTitleOldTablet.setTextColor(getResources().getColor(android.R.color.darker_gray));
+        mBrushSizeChooserOldTablet = (SeekBar)findViewById(R.id.brush_size_chooser_old_tablet);
+        mBrushSizeChooserOldTablet.setEnabled(false);
+        mBrushSizeChooserOldTablet.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                mDrawView.setBrushSizeOldTablet(progress);
+                mBrushSizeChooserTextOldTablet.setText(String.valueOf(progress));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+        mBrushSizeChooserOldTablet.setProgress(getResources().getInteger(R.integer.initial_size_old_tablet));
 
 
         mAlphaChooserText = (TextView)findViewById(R.id.alpha_chooser_text);
@@ -178,6 +206,21 @@ public class Dnp extends Activity implements View.OnClickListener, ColorChooserD
             mAlphaChooser.setEnabled(true);
             mAlphaChooserText.setTextColor(getResources().getColor(android.R.color.black));
             mAlphaChooserTitle.setTextColor(getResources().getColor(android.R.color.black));
+        }
+    }
+
+    public void oldTabletModeClicked(View view) {
+        boolean on = ((Switch) view).isChecked();
+        if (on) {
+            mDrawView.setOldTabletMode(true);
+            mBrushSizeChooserOldTablet.setEnabled(true);
+            mBrushSizeChooserTextOldTablet.setTextColor(getResources().getColor(android.R.color.black));
+            mBrushSizeChooserTitleOldTablet.setTextColor(getResources().getColor(android.R.color.black));
+        } else {
+            mDrawView.setOldTabletMode(false);
+            mBrushSizeChooserOldTablet.setEnabled(false);
+            mBrushSizeChooserTextOldTablet.setTextColor(getResources().getColor(android.R.color.darker_gray));
+            mBrushSizeChooserTitleOldTablet.setTextColor(getResources().getColor(android.R.color.darker_gray));
         }
     }
 
