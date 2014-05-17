@@ -9,6 +9,7 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
+import android.os.Handler;
 import android.support.v4.view.MotionEventCompat;
 import android.util.AttributeSet;
 import android.util.SparseArray;
@@ -23,6 +24,14 @@ import com.tacitus.dnp.R;
 import junit.framework.Assert;
 
 public class DrawingView extends View {
+
+    private class DrawWatcher implements Runnable {
+
+        @Override
+        public void run() {
+            mCurrentColorCursor = -1;
+        }
+    }
 
     private class DrawPath {
         private Path mDrawPath;
@@ -89,9 +98,13 @@ public class DrawingView extends View {
 
     }
 
+    private Handler mHandler;
+    private DrawWatcher mDrawWatcher = new DrawWatcher();
+
     //drawing path & paint
     private SparseArray<DrawPath> mDrawPaths = new SparseArray<DrawPath>();
     private SparseArray<Integer> mDrawPaintColors = new SparseArray<Integer>();
+    private int mCurrentColorCursor = -1;
 
     private final int HOLLOW_LINE_THICKNESS_RATIO = 20;
 
@@ -121,6 +134,12 @@ public class DrawingView extends View {
         Assert.assertNotNull(resources);
         mCanvasPaint = new Paint(Paint.DITHER_FLAG);
         setBrushSize(resources.getInteger(R.integer.initial_size) * 2);
+        mHandler = new Handler();
+    }
+
+    public void initDrawWatcherTimer() {
+        mHandler.removeCallbacks(mDrawWatcher);
+        mHandler.postDelayed(mDrawWatcher, 10000);
     }
 
     private Paint createPaint() {
@@ -251,11 +270,12 @@ public class DrawingView extends View {
         switch (MotionEventCompat.getActionMasked(event)) {
             case MotionEvent.ACTION_POINTER_DOWN:
             case MotionEvent.ACTION_DOWN:
+                mCurrentColorCursor++;
 //                logEvent(event);
 
                 // Create path and draw a small line of 1 pixel:
                 DrawPath drawPath = new DrawPath(size, pressure);
-                Integer color = getColor(id);
+                Integer color = getColor(mCurrentColorCursor);
                 if (color != null) {
                     drawPath.setColor(color);
                     drawPath.moveTo(touchX, touchY);
@@ -269,6 +289,7 @@ public class DrawingView extends View {
                             R.string.no_color_chosen, Toast.LENGTH_SHORT);
                     noColorChosen.show();
                 }
+                initDrawWatcherTimer();
                 break;
 
             case MotionEvent.ACTION_MOVE:
@@ -283,6 +304,7 @@ public class DrawingView extends View {
                         drawPath.drawPath();
                     }
                 }
+                initDrawWatcherTimer();
                 break;
 
             case MotionEvent.ACTION_CANCEL:
@@ -294,6 +316,7 @@ public class DrawingView extends View {
                     mDrawPaths.remove(id);
                     drawPath.closePath();
                 }
+                initDrawWatcherTimer();
                 break;
 
             default:
@@ -362,12 +385,14 @@ public class DrawingView extends View {
 
     public void startNew(){
         mDrawCanvas.drawColor(0, PorterDuff.Mode.CLEAR);
+        mCurrentColorCursor = -1;
         invalidate();
     }
 
     public void loadImage(Bitmap bitmap) {
         mDrawCanvas.drawColor(0, PorterDuff.Mode.CLEAR);
         mDrawCanvas.drawBitmap(bitmap, 0, 0, null);
+        mCurrentColorCursor = -1;
         invalidate();
     }
 
@@ -378,6 +403,10 @@ public class DrawingView extends View {
 
     public void setOldTabletMode(boolean oldTabletMode) {
         mOldTabletMode = oldTabletMode;
+    }
+
+    public void resetColorOrder() {
+        mCurrentColorCursor = -1;
     }
 
 }

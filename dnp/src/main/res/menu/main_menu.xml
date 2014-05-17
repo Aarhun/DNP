@@ -2,6 +2,12 @@
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
+        android:id="@+id/reset_color_order_btn"
+        android:icon="@android:drawable/ic_menu_delete"
+        android:title="@string/reset_color_order"
+        android:showAsAction="ifRoom"/>
+
+    <item
         android:id="@+id/new_btn"
         android:icon="@android:drawable/ic_menu_add"
         android:title="@string/start_new"
