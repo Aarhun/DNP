@@ -104,7 +104,7 @@ public class DrawingView extends View {
     //drawing path & paint
     private SparseArray<DrawPath> mDrawPaths = new SparseArray<DrawPath>();
     private SparseArray<Integer> mDrawPaintColors = new SparseArray<Integer>();
-    private int mCurrentColorCursor = -1;
+    private int mCurrentColorCursor;
 
     private final int HOLLOW_LINE_THICKNESS_RATIO = 20;
 
@@ -130,6 +130,7 @@ public class DrawingView extends View {
 
     public DrawingView(Context context, AttributeSet attrs){
         super(context, attrs);
+        resetColorOrder();
         Resources resources = getResources();
         Assert.assertNotNull(resources);
         mCanvasPaint = new Paint(Paint.DITHER_FLAG);
@@ -270,7 +271,6 @@ public class DrawingView extends View {
         switch (MotionEventCompat.getActionMasked(event)) {
             case MotionEvent.ACTION_POINTER_DOWN:
             case MotionEvent.ACTION_DOWN:
-                mCurrentColorCursor++;
 //                logEvent(event);
 
                 // Create path and draw a small line of 1 pixel:
@@ -306,10 +306,10 @@ public class DrawingView extends View {
                 }
                 initDrawWatcherTimer();
                 break;
-
+            case MotionEvent.ACTION_UP:
+                mCurrentColorCursor++;
             case MotionEvent.ACTION_CANCEL:
             case MotionEvent.ACTION_POINTER_UP:
-            case MotionEvent.ACTION_UP:
                 // Delete path:
                 drawPath = mDrawPaths.get(id);
                 if (drawPath != null) {
@@ -385,14 +385,14 @@ public class DrawingView extends View {
 
     public void startNew(){
         mDrawCanvas.drawColor(0, PorterDuff.Mode.CLEAR);
-        mCurrentColorCursor = -1;
+        resetColorOrder();
         invalidate();
     }
 
     public void loadImage(Bitmap bitmap) {
         mDrawCanvas.drawColor(0, PorterDuff.Mode.CLEAR);
         mDrawCanvas.drawBitmap(bitmap, 0, 0, null);
-        mCurrentColorCursor = -1;
+        resetColorOrder();
         invalidate();
     }
 
@@ -406,7 +406,7 @@ public class DrawingView extends View {
     }
 
     public void resetColorOrder() {
-        mCurrentColorCursor = -1;
+        mCurrentColorCursor = 0;
     }
 
 }
