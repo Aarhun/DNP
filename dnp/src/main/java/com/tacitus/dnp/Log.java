@@ -1,5 +1,9 @@
 package com.tacitus.dnp;
 
+import android.support.v4.view.MotionEventCompat;
+import android.view.InputDevice;
+import android.view.MotionEvent;
+
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
@@ -14,6 +18,80 @@ public class Log {
 	final static int DEFAULT_LOG_LINE_SIZE = 512;
 
 	static int LOG_LEVEL = VERB;
+
+
+
+    public static void logEvent(MotionEvent event) {
+        int index = MotionEventCompat.getActionIndex(event);
+        for (InputDevice.MotionRange motionRange : event.getDevice().getMotionRanges()) {
+            switch (motionRange.getAxis()) {
+                case MotionEvent.AXIS_X:
+                    Log.e("AXIS_X");
+                    Log.e("Max: ", motionRange.getMax());
+                    Log.e("Min: ", motionRange.getMin());
+                    Log.e("Current: ", event.getX(index));
+                    Log.e("***********************");
+                    break;
+                case MotionEvent.AXIS_Y:
+                    Log.e("AXIS_Y");
+                    Log.e("Max: ", motionRange.getMax());
+                    Log.e("Min: ", motionRange.getMin());
+                    Log.e("Current: ", event.getY(index));
+                    Log.e("***********************");
+                    break;
+                case MotionEvent.AXIS_PRESSURE:
+                    Log.e("AXIS_PRESSURE");
+                    Log.e("Max: ", motionRange.getMax());
+                    Log.e("Min: ", motionRange.getMin());
+                    Log.e("Current: ", event.getPressure(index));
+                    Log.e("***********************");
+                    break;
+                case MotionEvent.AXIS_SIZE:
+                    Log.e("AXIS_SIZE");
+                    Log.e("Max: ", motionRange.getMax());
+                    Log.e("Min: ", motionRange.getMin());
+                    Log.e("Current: ", event.getSize(index));
+                    Log.e("***********************");
+                    break;
+                case MotionEvent.AXIS_TOUCH_MAJOR:
+                    Log.e("AXIS_TOUCH_MAJOR");
+                    Log.e("Max: ", motionRange.getMax());
+                    Log.e("Min: ", motionRange.getMin());
+                    Log.e("Current: ", event.getTouchMajor(index));
+                    Log.e("***********************");
+                    break;
+                case MotionEvent.AXIS_TOUCH_MINOR:
+                    Log.e("AXIS_TOUCH_MINOR");
+                    Log.e("Max: ", motionRange.getMax());
+                    Log.e("Min: ", motionRange.getMin());
+                    Log.e("Current: ", event.getTouchMinor(index));
+                    Log.e("***********************");
+                    break;
+                case MotionEvent.AXIS_TOOL_MAJOR:
+                    Log.e("AXIS_TOOL_MAJOR");
+                    Log.e("Max: ", motionRange.getMax());
+                    Log.e("Min: ", motionRange.getMin());
+                    Log.e("Current: ", event.getToolMajor(index));
+                    Log.e("***********************");
+                    break;
+                case MotionEvent.AXIS_TOOL_MINOR:
+                    Log.e("AXIS_TOOL_MINOR");
+                    Log.e("Max: ", motionRange.getMax());
+                    Log.e("Min: ", motionRange.getMin());
+                    Log.e("Current: ", event.getToolMinor(index));
+                    Log.e("***********************");
+                    break;
+                case MotionEvent.AXIS_ORIENTATION:
+                    Log.e("AXIS_ORIENTATION");
+                    Log.e("Max: ", motionRange.getMax());
+                    Log.e("Min: ", motionRange.getMin());
+                    Log.e("Current: ", event.getOrientation(index));
+                    Log.e("***********************");
+                    break;
+            }
+        }
+    }
+
 
 	/**
 	 * Error

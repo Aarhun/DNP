@@ -18,7 +18,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
-import com.tacitus.dnp.Log;
 import com.tacitus.dnp.R;
 
 import junit.framework.Assert;
@@ -29,7 +28,7 @@ public class DrawingView extends View {
 
         @Override
         public void run() {
-            mCurrentColorCursor = -1;
+            resetColorOrder();
         }
     }
 
@@ -99,7 +98,6 @@ public class DrawingView extends View {
         public void resetPath() {
             mDrawPath.reset();
         }
-
 
     }
 
@@ -174,81 +172,8 @@ public class DrawingView extends View {
          //draw view
         canvas.drawBitmap(mCanvasBitmap, 0, 0, mCanvasPaint);
         for (int i=0; i<mDrawPaths.size(); i++) {
-            DrawPath drawPath = mDrawPaths.get(i);
-            if (drawPath != null) {
-                drawPath.drawPath(canvas);
-            }
-        }
-    }
-
-    private void logEvent(MotionEvent event) {
-        int index = MotionEventCompat.getActionIndex(event);
-        for (InputDevice.MotionRange motionRange : event.getDevice().getMotionRanges()) {
-            switch (motionRange.getAxis()) {
-                case MotionEvent.AXIS_X:
-                    Log.e("AXIS_X");
-                    Log.e("Max: ", motionRange.getMax());
-                    Log.e("Min: ", motionRange.getMin());
-                    Log.e("Current: ", event.getX(index));
-                    Log.e("***********************");
-                    break;
-                case MotionEvent.AXIS_Y:
-                    Log.e("AXIS_Y");
-                    Log.e("Max: ", motionRange.getMax());
-                    Log.e("Min: ", motionRange.getMin());
-                    Log.e("Current: ", event.getY(index));
-                    Log.e("***********************");
-                    break;
-                case MotionEvent.AXIS_PRESSURE:
-                    Log.e("AXIS_PRESSURE");
-                    Log.e("Max: ", motionRange.getMax());
-                    Log.e("Min: ", motionRange.getMin());
-                    Log.e("Current: ", event.getPressure(index));
-                    Log.e("***********************");
-                    break;
-                case MotionEvent.AXIS_SIZE:
-                    Log.e("AXIS_SIZE");
-                    Log.e("Max: ", motionRange.getMax());
-                    Log.e("Min: ", motionRange.getMin());
-                    Log.e("Current: ", event.getSize(index));
-                    Log.e("***********************");
-                    break;
-                case MotionEvent.AXIS_TOUCH_MAJOR:
-                    Log.e("AXIS_TOUCH_MAJOR");
-                    Log.e("Max: ", motionRange.getMax());
-                    Log.e("Min: ", motionRange.getMin());
-                    Log.e("Current: ", event.getTouchMajor(index));
-                    Log.e("***********************");
-                    break;
-                case MotionEvent.AXIS_TOUCH_MINOR:
-                    Log.e("AXIS_TOUCH_MINOR");
-                    Log.e("Max: ", motionRange.getMax());
-                    Log.e("Min: ", motionRange.getMin());
-                    Log.e("Current: ", event.getTouchMinor(index));
-                    Log.e("***********************");
-                    break;
-                case MotionEvent.AXIS_TOOL_MAJOR:
-                    Log.e("AXIS_TOOL_MAJOR");
-                    Log.e("Max: ", motionRange.getMax());
-                    Log.e("Min: ", motionRange.getMin());
-                    Log.e("Current: ", event.getToolMajor(index));
-                    Log.e("***********************");
-                    break;
-                case MotionEvent.AXIS_TOOL_MINOR:
-                    Log.e("AXIS_TOOL_MINOR");
-                    Log.e("Max: ", motionRange.getMax());
-                    Log.e("Min: ", motionRange.getMin());
-                    Log.e("Current: ", event.getToolMinor(index));
-                    Log.e("***********************");
-                    break;
-                case MotionEvent.AXIS_ORIENTATION:
-                    Log.e("AXIS_ORIENTATION");
-                    Log.e("Max: ", motionRange.getMax());
-                    Log.e("Min: ", motionRange.getMin());
-                    Log.e("Current: ", event.getOrientation(index));
-                    Log.e("***********************");
-                    break;
-            }
+            DrawPath drawPath = mDrawPaths.valueAt(i);
+            drawPath.drawPath(canvas);
         }
     }
 
@@ -283,7 +208,7 @@ public class DrawingView extends View {
         switch (MotionEventCompat.getActionMasked(event)) {
             case MotionEvent.ACTION_POINTER_DOWN:
             case MotionEvent.ACTION_DOWN:
-//                logEvent(event);
+//                Log.logEvent(event);
 
                 // Create path and draw a small line of 1 pixel:
                 Integer color = getColor(mCurrentColorCursor);
@@ -292,7 +217,9 @@ public class DrawingView extends View {
                     drawPath.moveTo(touchX, touchY);
                     drawPath.lineTo(touchX - 1, touchY - 1);
                     mDrawPaths.put(id, drawPath);
-                } else {
+                    invalidate();
+                } else if (MotionEventCompat.getActionMasked(event) == MotionEvent.ACTION_DOWN){
+                    // Toast only for ACTION_DOWN to avoid spamming.
                     Context context = getContext();
                     Assert.assertNotNull(context);
                     Toast noColorChosen = Toast.makeText(context,
@@ -314,6 +241,7 @@ public class DrawingView extends View {
                     }
                 }
                 initDrawWatcherTimer();
+                invalidate();
                 break;
             case MotionEvent.ACTION_UP:
                 mCurrentColorCursor++;
@@ -325,6 +253,8 @@ public class DrawingView extends View {
                     drawPath.lineTo(touchX, touchY);
                     drawPath.drawPath();
                     drawPath.resetPath();
+                    mDrawPaths.remove(id);
+                    invalidate();
                 }
                 initDrawWatcherTimer();
                 break;
@@ -333,7 +263,6 @@ public class DrawingView extends View {
                 // Do not consume other events.
                 return false;
         }
-        invalidate();
         // Consume handled event.
         return true;
     }
