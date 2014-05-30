@@ -96,9 +96,10 @@ public class DrawingView extends View {
             }
         }
 
-        public void closePath() {
-            mDrawPath.close();
+        public void resetPath() {
+            mDrawPath.reset();
         }
+
 
     }
 
@@ -321,10 +322,9 @@ public class DrawingView extends View {
                 // Delete path:
                 drawPath = mDrawPaths.get(id);
                 if (drawPath != null) {
-                    mDrawPaths.remove(id);
                     drawPath.lineTo(touchX, touchY);
                     drawPath.drawPath();
-                    drawPath.closePath();
+                    drawPath.resetPath();
                 }
                 initDrawWatcherTimer();
                 break;
