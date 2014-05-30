@@ -41,10 +41,10 @@ public class DrawingView extends View {
         private float mSizeHollow;
         private float mPressure;
 
-        private DrawPath(float size, float pressure) {
+        private DrawPath(float size, float pressure, int color) {
             mDrawPath = new Path();
             mDrawPaint = createPaint();
-            mDrawPaint.setColor(mPaintColor);
+            mDrawPaint.setColor(color);
             mSize = size;
             mPressure = pressure;
             if (!mTouchSizeMode) {
@@ -58,14 +58,12 @@ public class DrawingView extends View {
                 mDrawPaintHollow.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
             }
             mDrawPaint.setStrokeWidth(mSize);
+            // WARNING: When changing color needs to define alpha AFTER
+            // Because color contains some alpha setting.
             mDrawPaint.setAlpha(mPaintAlpha);
             if (mPressureMode) {
                 mDrawPaint.setAlpha((int) (mPressure * 255));
             }
-        }
-
-        public void setColor(int color) {
-            mDrawPaint.setColor(color);
         }
 
         public void moveTo(float x, float y) {
@@ -89,7 +87,13 @@ public class DrawingView extends View {
             if (mDrawPaintHollow != null) {
                 mDrawCanvas.drawPath(mDrawPath, mDrawPaintHollow);
             }
-            invalidate();
+        }
+
+        public void drawPath(Canvas canvas) {
+            canvas.drawPath(mDrawPath, mDrawPaint);
+            if (mDrawPaintHollow != null) {
+                canvas.drawPath(mDrawPath, mDrawPaintHollow);
+            }
         }
 
         public void closePath() {
@@ -168,6 +172,12 @@ public class DrawingView extends View {
     protected void onDraw(Canvas canvas) {
          //draw view
         canvas.drawBitmap(mCanvasBitmap, 0, 0, mCanvasPaint);
+        for (int i=0; i<mDrawPaths.size(); i++) {
+            DrawPath drawPath = mDrawPaths.get(i);
+            if (drawPath != null) {
+                drawPath.drawPath(canvas);
+            }
+        }
     }
 
     private void logEvent(MotionEvent event) {
@@ -267,6 +277,7 @@ public class DrawingView extends View {
         }
         float size = (((event.getTouchMajor(index) / touchMajorMax) + (event.getTouchMinor(index) / touchMinorMax)) / 2) * multiplier;
         float pressure = event.getPressure(index);
+        DrawPath drawPath;
 
         switch (MotionEventCompat.getActionMasked(event)) {
             case MotionEvent.ACTION_POINTER_DOWN:
@@ -274,13 +285,11 @@ public class DrawingView extends View {
 //                logEvent(event);
 
                 // Create path and draw a small line of 1 pixel:
-                DrawPath drawPath = new DrawPath(size, pressure);
                 Integer color = getColor(mCurrentColorCursor);
                 if (color != null) {
-                    drawPath.setColor(color);
+                    drawPath = new DrawPath(size, pressure, color);
                     drawPath.moveTo(touchX, touchY);
                     drawPath.lineTo(touchX - 1, touchY - 1);
-                    drawPath.drawPath();
                     mDrawPaths.put(id, drawPath);
                 } else {
                     Context context = getContext();
@@ -301,7 +310,6 @@ public class DrawingView extends View {
                         touchX = MotionEventCompat.getX(event, i);
                         touchY = MotionEventCompat.getY(event, i);
                         drawPath.lineTo(touchX, touchY);
-                        drawPath.drawPath();
                     }
                 }
                 initDrawWatcherTimer();
@@ -314,6 +322,8 @@ public class DrawingView extends View {
                 drawPath = mDrawPaths.get(id);
                 if (drawPath != null) {
                     mDrawPaths.remove(id);
+                    drawPath.lineTo(touchX, touchY);
+                    drawPath.drawPath();
                     drawPath.closePath();
                 }
                 initDrawWatcherTimer();
@@ -323,6 +333,7 @@ public class DrawingView extends View {
                 // Do not consume other events.
                 return false;
         }
+        invalidate();
         // Consume handled event.
         return true;
     }
