@@ -160,6 +160,14 @@ public class Dnp extends Activity implements View.OnClickListener, ColorChooserD
 
     }
 
+    public void underlineClicked(View view) {
+        boolean on = ((Switch) view).isChecked();
+        if (on) {
+            mDrawView.setUnderlineMode(true);
+        } else {
+            mDrawView.setUnderlineMode(false);
+        }
+    }
 
     public void hollowClicked(View view) {
         boolean on = ((Switch) view).isChecked();

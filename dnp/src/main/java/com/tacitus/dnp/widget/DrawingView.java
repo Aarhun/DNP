@@ -57,6 +57,9 @@ public class DrawingView extends View {
                 mDrawPaintHollow.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
             }
             mDrawPaint.setStrokeWidth(mSize);
+            if (mUnderlineMode && !mEraseMode) {
+                mDrawPaint.setShadowLayer(1f, mSize / 2, mSize / 2, Color.BLACK);
+            }
             // WARNING: When changing color needs to define alpha AFTER
             // Because color contains some alpha setting.
             mDrawPaint.setAlpha(mPaintAlpha);
@@ -117,6 +120,7 @@ public class DrawingView extends View {
     //canvas
     private Canvas mDrawCanvas;
     private boolean mHollowMode = false;
+    private boolean mUnderlineMode = false;
     private boolean mTouchSizeMode = true;
     private boolean mEraseMode = false;
     private boolean mPressureMode = false;
@@ -310,6 +314,11 @@ public class DrawingView extends View {
     public void setHollowMode(boolean hollowMode) {
         mHollowMode = hollowMode;
     }
+
+    public void setUnderlineMode(boolean underlineMode) {
+        mUnderlineMode = underlineMode;
+    }
+
 
     public void setEraseMode(boolean eraseMode) {
         mEraseMode = eraseMode;

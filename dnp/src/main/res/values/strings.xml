@@ -13,6 +13,7 @@
     <string name="dnp_sun">DNP SUN</string>
     <string name="paint">Paint</string>
     <string name="hollow_text">Hollow mode:</string>
+    <string name="underline_text">Underline mode:</string>
     <string name="touch_size_text">Touch size mode:</string>
     <string name="pressure_text">Pressure mode:</string>
     <string name="erase_mode_text">Erase mode:</string>
