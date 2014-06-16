@@ -1,42 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string name="alpha_value">Transparency value:</string>
     <string name="app_name">DNP</string>
-
-    <string name="start_new">New</string>
-    <string name="reset_color_order">Reset color order</string>
-    <string name="brush">Brush</string>
-    <string name="erase">Erase</string>
-    <string name="save">Save</string>
-    <string name="load">Load</string>
-    <string name="choose_color">Choose color</string>
-    <string name="dnp_sun">DNP SUN</string>
-    <string name="paint">Paint</string>
-    <string name="hollow_text">Hollow mode:</string>
-    <string name="underline_text">Underline mode:</string>
-    <string name="touch_size_text">Touch size mode:</string>
-    <string name="pressure_text">Pressure mode:</string>
-    <string name="erase_mode_text">Erase mode:</string>
-    <string name="brush_size">Brush size:</string>
-    <string name="alpha_value">Alpha value:</string>
-    <string name="new_dialog_title">New drawing</string>
-    <string name="new_dialog_message">Start new drawing (you will lose the current drawing)?</string>
-    <string name="save_dialog_title">Save drawing</string>
-    <string name="save_dialog_message">Save drawing to device Gallery?</string>
-    <string name="load_dialog_title">Load drawing</string>
-    <string name="load_dialog_message">Load drawing from device Gallery?</string>
-    <string name="color_chooser_dialog_title">Color chooser</string>
-    <string name="color_chooser_dialog_message">Choose a color:</string>
-    <string name="save_dialog_ok">Drawing saved to Gallery!</string>
-    <string name="save_dialog_ko">Oops! Image could not be saved.</string>
-    <string name="no_color_chosen">No color chosen, press top right button.</string>
-    <string name="clear_color">CLEAR</string>
-    <string name="sml">Small</string>
-    <string name="med">Medium</string>
-    <string name="lrg">Large</string>
-    <string name="drawer_open">Open</string>
-    <string name="drawer_close">Close</string>
     <string name="brush_size_old_tablet">Brush size (old tablet):</string>
-    <string name="old_tablet_mode">Old tablet mode:</string>
+    <string name="brush_size">Brush size:</string>
+    <string name="choose_color">Choose color</string>
+    <string name="clear_color">CLEAR</string>
+    <string name="color_chooser_dialog_message">Choose a color:</string>
+    <string name="color_chooser_dialog_title">Color chooser</string>
+    <string name="dnp_sun">DNP SUN</string>
+    <string name="drawer_close">Close</string>
+    <string name="drawer_open">Open</string>
+    <string name="erase_mode_text">Erase mode:</string>
+    <string name="erase">Erase</string>
+    <string name="hollow_text">Hollow mode:</string>
+    <string name="load_dialog_message">Load drawing from device Gallery ?</string>
+    <string name="load_dialog_title">Load drawing</string>
+    <string name="load">Load</string>
+    <string name="new_dialog_message">Start new drawing ? (you will lose the current drawing)</string>
+    <string name="new_dialog_title">New drawing</string>
+    <string name="no_color_chosen">No color chosen, please press top right button.</string>
+    <string name="old_tablet_mode">Compatibility mode:</string>
+    <string name="paint">Color</string>
+    <string name="pressure_text">Pressure mode:</string>
+    <string name="reset_color_order">Reset color order</string>
+    <string name="save_dialog_ko">Oops ! Image could not be saved.</string>
+    <string name="save_dialog_message">Save drawing to device Gallery ?</string>
+    <string name="save_dialog_ok">Drawing saved to Gallery !</string>
+    <string name="save_dialog_title">Save drawing</string>
+    <string name="save">Save</string>
+    <string name="start_new">New</string>
+    <string name="touch_size_text">Touch size mode:</string>
+    <string name="underline_text">Underline mode:</string>
 
 </resources>
