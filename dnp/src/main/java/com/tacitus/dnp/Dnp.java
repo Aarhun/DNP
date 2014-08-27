@@ -26,6 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tacitus.dnp.widget.ColorChooserDialog;
+import com.tacitus.dnp.widget.DnpColor;
 import com.tacitus.dnp.widget.DrawingView;
 
 import junit.framework.Assert;
@@ -54,6 +55,8 @@ public class Dnp extends Activity implements View.OnClickListener, ColorChooserD
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        new DnpColor(this);
+
         setContentView(R.layout.activity_dnp);
 
         // Initialize the drawer menu
