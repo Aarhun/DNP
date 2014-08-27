@@ -3,18 +3,25 @@
 
     <string name="alpha_value">Valeur de\ntransparence:</string>
     <string name="app_name">DNP</string>
+    <string name="blue">Bleu</string>
     <string name="brush_size_old_tablet">Épaisseur du trait\n(compatibilité):</string>
     <string name="brush_size">Épaisseur du trait:</string>
     <string name="choose_color">Choisissez une couleur</string>
     <string name="clear_color">EFFACER</string>
     <string name="color_chooser_dialog_message">Choisissez une couleur:</string>
     <string name="color_chooser_dialog_title">Sélecteur de couleur</string>
+    <string name="dark_brown">Brun Foncé</string>
+    <string name="dark_green">Vert Foncé</string>
     <string name="dnp_sun">SOLEIL DNP</string>
     <string name="drawer_close">Fermer</string>
     <string name="drawer_open">Ouvrir</string>
     <string name="erase_mode_text">Mode effacement:</string>
     <string name="erase">Effacer</string>
+    <string name="green">Vert</string>
+    <string name="grey">Gris</string>
     <string name="hollow_text">Mode creux:</string>
+    <string name="light_brown">Brun Clair</string>
+    <string name="light_green">Vert Clair</string>
     <string name="load_dialog_message">Charger une image depuis la gallerie ?</string>
     <string name="load_dialog_title">Charger une image</string>
     <string name="load">Charger</string>
@@ -26,6 +33,7 @@
     <string name="old_tablet_mode">Mode compatibilité:</string>
     <string name="paint">Couleur</string>
     <string name="pressure_text">Mode pression:</string>
+    <string name="red">Rouge</string>
     <string name="redo">Redessiner le dernier trait</string>
     <string name="reset_color_order">Remise à zéro de l\'ordre des couleurs</string>
     <string name="save_dialog_ko">Oops! L\'image n\'a pas pu être sauvegardée.</string>
@@ -37,4 +45,5 @@
     <string name="touch_size_text">Mode épaisseur du trait\npar contact:</string>
     <string name="underline_text">Mode souligné:</string>
     <string name="undo">Annuler le dernier trait</string>
+    <string name="yellow">Jaune</string>
 </resources>

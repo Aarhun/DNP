@@ -107,24 +107,15 @@ public class ColorChooserDialog extends Dialog implements View.OnClickListener {
                             // Limit possible color for dnp sun:
                             if (mIsDnp) {
                                 switch (color) {
-                                    case -14391260:
-                                        // Dark green
-                                    case -13463502:
-                                        // Green
-                                    case -12137658:
-                                        // Light green
-                                    case -2675411:
-                                        // Red
-                                    case -3837106:
-                                        // Light brown
-                                    case -7515592:
-                                        // Dark brown
-                                    case -13156710:
-                                        // Blue
-                                    case -465067:
-                                        // Yellow
-                                    case -4079167:
-                                        // Grey
+                                    case DnpColor.DARK_GREEN:
+                                    case DnpColor.GREEN:
+                                    case DnpColor.LIGHT_GREEN:
+                                    case DnpColor.RED:
+                                    case DnpColor.LIGHT_BROWN:
+                                    case DnpColor.DARK_BROWN:
+                                    case DnpColor.BLUE:
+                                    case DnpColor.YELLOW:
+                                    case DnpColor.GREY:
                                         setColor(stringColor, color);
                                         break;
                                 }

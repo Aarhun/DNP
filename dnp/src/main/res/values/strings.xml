@@ -3,18 +3,25 @@
 
     <string name="alpha_value">Transparency value:</string>
     <string name="app_name">DNP</string>
+    <string name="blue">Blue</string>
     <string name="brush_size_old_tablet">Brush size (old tablet):</string>
     <string name="brush_size">Brush size:</string>
     <string name="choose_color">Choose color</string>
     <string name="clear_color">CLEAR</string>
     <string name="color_chooser_dialog_message">Choose a color:</string>
     <string name="color_chooser_dialog_title">Color chooser</string>
+    <string name="dark_brown">Dark Brown</string>
+    <string name="dark_green">Dark Green</string>
     <string name="dnp_sun">DNP SUN</string>
     <string name="drawer_close">Close</string>
     <string name="drawer_open">Open</string>
     <string name="erase_mode_text">Erase mode:</string>
     <string name="erase">Erase</string>
+    <string name="green">Green</string>
+    <string name="grey">Grey</string>
     <string name="hollow_text">Hollow mode:</string>
+    <string name="light_brown">Light Brown</string>
+    <string name="light_green">Light Green</string>
     <string name="load_dialog_message">Load drawing from device Gallery ?</string>
     <string name="load_dialog_title">Load drawing</string>
     <string name="load">Load</string>
@@ -26,6 +33,7 @@
     <string name="old_tablet_mode">Compatibility mode:</string>
     <string name="paint">Color</string>
     <string name="pressure_text">Pressure mode:</string>
+    <string name="red">Red</string>
     <string name="redo">Redo last draw</string>
     <string name="reset_color_order">Reset color order</string>
     <string name="save_dialog_ko">Oops ! Image could not be saved.</string>
@@ -37,4 +45,5 @@
     <string name="touch_size_text">Touch size mode:</string>
     <string name="underline_text">Underline mode:</string>
     <string name="undo">Cancel last draw</string>
+    <string name="yellow">Yellow</string>
 </resources>
