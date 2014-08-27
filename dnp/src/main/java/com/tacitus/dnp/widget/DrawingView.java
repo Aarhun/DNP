@@ -22,6 +22,8 @@ import com.tacitus.dnp.R;
 
 import junit.framework.Assert;
 
+import java.util.ArrayList;
+
 public class DrawingView extends View {
 
     private class DrawWatcher implements Runnable {
@@ -39,6 +41,7 @@ public class DrawingView extends View {
         private float mSize;
         private float mSizeHollow;
         private float mPressure;
+
 
         private DrawPath(float size, float pressure, int color) {
             mDrawPath = new Path();
@@ -110,6 +113,8 @@ public class DrawingView extends View {
     //drawing path & paint
     private SparseArray<DrawPath> mDrawPaths = new SparseArray<DrawPath>();
     private SparseArray<Integer> mDrawPaintColors = new SparseArray<Integer>();
+    private ArrayList<DrawPath> mDrawPathsHistory = new ArrayList<DrawPath>();
+    private ArrayList<DrawPath> mDrawPathsRedoable = new ArrayList<DrawPath>();
     private int mCurrentColorCursor;
 
     private final int HOLLOW_LINE_THICKNESS_RATIO = 20;
@@ -127,9 +132,6 @@ public class DrawingView extends View {
     private boolean mOldTabletMode = false;
 
 
-    //canvas bitmap
-    private Bitmap mCanvasBitmap;
-
     private float mBrushSize;
     private float mBrushSizeOldTablet;
 
@@ -143,6 +145,7 @@ public class DrawingView extends View {
         mCanvasPaint = new Paint(Paint.DITHER_FLAG);
         setBrushSize(resources.getInteger(R.integer.initial_size) * 2);
         mHandler = new Handler();
+        mDrawCanvas = new Canvas();
     }
 
     public void initDrawWatcherTimer() {
@@ -167,18 +170,20 @@ public class DrawingView extends View {
     protected void onSizeChanged(int w, int h, int oldW, int oldH) {
         //view given size
         super.onSizeChanged(w, h, oldW, oldH);
-        mCanvasBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-        mDrawCanvas = new Canvas(mCanvasBitmap);
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
          //draw view
-        canvas.drawBitmap(mCanvasBitmap, 0, 0, mCanvasPaint);
+        for (int i=0; i<mDrawPathsHistory.size(); i++) {
+            DrawPath drawPath = mDrawPathsHistory.get(i);
+            drawPath.drawPath(canvas);
+        }
         for (int i=0; i<mDrawPaths.size(); i++) {
             DrawPath drawPath = mDrawPaths.valueAt(i);
             drawPath.drawPath(canvas);
         }
+
     }
 
     @Override
@@ -256,7 +261,8 @@ public class DrawingView extends View {
                 if (drawPath != null) {
                     drawPath.lineTo(touchX, touchY);
                     drawPath.drawPath();
-                    drawPath.resetPath();
+                    mDrawPathsHistory.add(drawPath);
+                    mDrawPathsRedoable.clear();
                     mDrawPaths.remove(id);
                     invalidate();
                 }
@@ -333,7 +339,7 @@ public class DrawingView extends View {
     }
 
     public void startNew(){
-        mDrawCanvas.drawColor(0, PorterDuff.Mode.CLEAR);
+        mDrawPathsHistory.clear();
         resetColorOrder();
         invalidate();
     }
@@ -341,6 +347,7 @@ public class DrawingView extends View {
     public void loadImage(Bitmap bitmap) {
         mDrawCanvas.drawColor(0, PorterDuff.Mode.CLEAR);
         mDrawCanvas.drawBitmap(bitmap, 0, 0, null);
+        mDrawPathsHistory.clear();
         resetColorOrder();
         invalidate();
     }
@@ -358,4 +365,38 @@ public class DrawingView extends View {
         mCurrentColorCursor = 0;
     }
 
+    public void undo() {
+        if (mDrawPathsHistory.size() > 0) {
+            // Never set the color to 0, it would means that no color are chosen.
+            if (mCurrentColorCursor > 1) {
+                mCurrentColorCursor--;
+            }
+            DrawPath lastPath = mDrawPathsHistory.get(mDrawPathsHistory.size() - 1);
+            mDrawPathsHistory.remove(lastPath);
+            mDrawPathsRedoable.add(lastPath);
+            invalidate();
+        } else {
+            Context context = getContext();
+            Assert.assertNotNull(context);
+            Toast nothingToUndo = Toast.makeText(context,
+                    R.string.nothing_to_undo, Toast.LENGTH_SHORT);
+            nothingToUndo.show();
+        }
+    }
+
+    public void redo() {
+        if (mDrawPathsRedoable.size() > 0) {
+            DrawPath lastPath = mDrawPathsRedoable.get(mDrawPathsRedoable.size() - 1);
+            mDrawPathsRedoable.remove(lastPath);
+            mDrawPathsHistory.add(lastPath);
+            invalidate();
+        } else {
+            Context context = getContext();
+            Assert.assertNotNull(context);
+            Toast nothingToRedo = Toast.makeText(context,
+                    R.string.nothing_to_redo, Toast.LENGTH_SHORT);
+            nothingToRedo.show();
+        }
+
+    }
 }

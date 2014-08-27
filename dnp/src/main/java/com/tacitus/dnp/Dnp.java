@@ -295,6 +295,13 @@ public class Dnp extends Activity implements View.OnClickListener, ColorChooserD
                 return true;
             case R.id.reset_color_order_btn:
                 mDrawView.resetColorOrder();
+                return true;
+            case R.id.undo_btn:
+                mDrawView.undo();
+                return true;
+            case R.id.redo_btn:
+                mDrawView.redo();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

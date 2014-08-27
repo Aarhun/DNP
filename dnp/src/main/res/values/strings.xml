@@ -20,10 +20,13 @@
     <string name="load">Load</string>
     <string name="new_dialog_message">Start new drawing ? (you will lose the current drawing)</string>
     <string name="new_dialog_title">New drawing</string>
+    <string name="nothing_to_redo">Nothing to redo !</string>
+    <string name="nothing_to_undo">Nothing to undo !</string>
     <string name="no_color_chosen">No color chosen, please press top right button.</string>
     <string name="old_tablet_mode">Compatibility mode:</string>
     <string name="paint">Color</string>
     <string name="pressure_text">Pressure mode:</string>
+    <string name="redo">Redo last draw</string>
     <string name="reset_color_order">Reset color order</string>
     <string name="save_dialog_ko">Oops ! Image could not be saved.</string>
     <string name="save_dialog_message">Save drawing to device Gallery ?</string>
@@ -33,5 +36,5 @@
     <string name="start_new">New</string>
     <string name="touch_size_text">Touch size mode:</string>
     <string name="underline_text">Underline mode:</string>
-
+    <string name="undo">Cancel last draw</string>
 </resources>
