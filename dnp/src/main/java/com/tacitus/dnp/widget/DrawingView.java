@@ -131,6 +131,8 @@ public class DrawingView extends View {
     private boolean mPressureMode = false;
     private boolean mOldTabletMode = false;
 
+    private Bitmap mCanvasBitmap;
+    private Bitmap mLoadedBitmap;
 
     private float mBrushSize;
     private float mBrushSizeOldTablet;
@@ -145,7 +147,6 @@ public class DrawingView extends View {
         mCanvasPaint = new Paint(Paint.DITHER_FLAG);
         setBrushSize(resources.getInteger(R.integer.initial_size) * 2);
         mHandler = new Handler();
-        mDrawCanvas = new Canvas();
     }
 
     public void initDrawWatcherTimer() {
@@ -170,19 +171,24 @@ public class DrawingView extends View {
     protected void onSizeChanged(int w, int h, int oldW, int oldH) {
         //view given size
         super.onSizeChanged(w, h, oldW, oldH);
+        if (mCanvasBitmap != null) {
+            mCanvasBitmap.recycle();
+        }
+        mCanvasBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+        mDrawCanvas = new Canvas(mCanvasBitmap);
     }
+
 
     @Override
     protected void onDraw(Canvas canvas) {
-         //draw view
-        for (int i=0; i<mDrawPathsHistory.size(); i++) {
-            DrawPath drawPath = mDrawPathsHistory.get(i);
-            drawPath.drawPath(canvas);
-        }
+        // Draw the bitmap on hardware canvas
+        canvas.drawBitmap(mCanvasBitmap, 0, 0, mCanvasPaint);
+        // Temporary drawing current drawn paths on hardware canvas
         for (int i=0; i<mDrawPaths.size(); i++) {
             DrawPath drawPath = mDrawPaths.valueAt(i);
             drawPath.drawPath(canvas);
         }
+
 
     }
 
@@ -226,6 +232,7 @@ public class DrawingView extends View {
                     drawPath.moveTo(touchX, touchY);
                     drawPath.lineTo(touchX - 1, touchY - 1);
                     mDrawPaths.put(id, drawPath);
+                    // This will call the onDraw callback to draw the path temporarily in hardware canvas:
                     invalidate();
                 } else if (MotionEventCompat.getActionMasked(event) == MotionEvent.ACTION_DOWN){
                     // Toast only for ACTION_DOWN to avoid spamming.
@@ -250,6 +257,7 @@ public class DrawingView extends View {
                     }
                 }
                 initDrawWatcherTimer();
+                // This will call the onDraw callback to draw the path temporarily in hardware canvas:
                 invalidate();
                 break;
             case MotionEvent.ACTION_UP:
@@ -260,10 +268,12 @@ public class DrawingView extends View {
                 drawPath = mDrawPaths.get(id);
                 if (drawPath != null) {
                     drawPath.lineTo(touchX, touchY);
+                    // Draw path definitely on bitmap:
                     drawPath.drawPath();
                     mDrawPathsHistory.add(drawPath);
                     mDrawPathsRedoable.clear();
                     mDrawPaths.remove(id);
+                    // This will call the onDraw callback to draw the bitmap on hardware canvas:
                     invalidate();
                 }
                 initDrawWatcherTimer();
@@ -339,13 +349,17 @@ public class DrawingView extends View {
     }
 
     public void startNew(){
+        mDrawCanvas.drawColor(0, PorterDuff.Mode.CLEAR);
         mDrawPathsHistory.clear();
         resetColorOrder();
         invalidate();
     }
 
     public void loadImage(Bitmap bitmap) {
-        mDrawCanvas.drawColor(0, PorterDuff.Mode.CLEAR);
+        if (mLoadedBitmap != null) {
+            mLoadedBitmap.recycle();
+        }
+        mLoadedBitmap = Bitmap.createBitmap(bitmap);
         mDrawCanvas.drawBitmap(bitmap, 0, 0, null);
         mDrawPathsHistory.clear();
         resetColorOrder();
@@ -374,6 +388,8 @@ public class DrawingView extends View {
             DrawPath lastPath = mDrawPathsHistory.get(mDrawPathsHistory.size() - 1);
             mDrawPathsHistory.remove(lastPath);
             mDrawPathsRedoable.add(lastPath);
+            resetCanvas();
+            redrawAllPaths();
             invalidate();
         } else {
             Context context = getContext();
@@ -389,6 +405,7 @@ public class DrawingView extends View {
             DrawPath lastPath = mDrawPathsRedoable.get(mDrawPathsRedoable.size() - 1);
             mDrawPathsRedoable.remove(lastPath);
             mDrawPathsHistory.add(lastPath);
+            lastPath.drawPath();
             invalidate();
         } else {
             Context context = getContext();
@@ -398,5 +415,18 @@ public class DrawingView extends View {
             nothingToRedo.show();
         }
 
+    }
+
+    private void redrawAllPaths() {
+        for (int i=0; i<mDrawPathsHistory.size(); ++i) {
+            mDrawPathsHistory.get(i).drawPath();
+        }
+    }
+    private void resetCanvas() {
+        if (mLoadedBitmap != null) {
+            mDrawCanvas.drawBitmap(mLoadedBitmap, 0, 0, null);
+        } else {
+            mDrawCanvas.drawColor(0, PorterDuff.Mode.CLEAR);
+        }
     }
 }
