@@ -260,7 +260,6 @@ public class Dnp extends Activity implements View.OnClickListener, ColorChooserD
                     Bitmap bitmap = BitmapFactory.decodeFile(picturePath);
                     if (bitmap != null) {
                         mDrawView.loadImage(bitmap);
-                        bitmap.recycle();
                     }
                 }
             }
