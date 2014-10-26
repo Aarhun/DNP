@@ -46,4 +46,10 @@
         android:title="@string/choose_color"
         android:icon="@android:drawable/ic_menu_compass"
         android:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/choose_scenario_btn"
+        android:title="@string/choose_scenario"
+        android:icon="@android:drawable/ic_menu_agenda"
+        android:showAsAction="ifRoom"/>
 </menu>

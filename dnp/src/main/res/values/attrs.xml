@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <declare-styleable name="sun_color_states">
         <attr name="state_dark_green" format="boolean" />
         <attr name="state_green" format="boolean" />
@@ -11,4 +12,9 @@
         <attr name="state_yellow" format="boolean" />
         <attr name="state_grey" format="boolean" />
     </declare-styleable>
+    <declare-styleable name="ButtonBarContainerTheme">
+        <attr name="metaButtonBarStyle" format="reference" />
+        <attr name="metaButtonBarButtonStyle" format="reference" />
+    </declare-styleable>
+
 </resources>

@@ -13,6 +13,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
@@ -25,6 +26,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.tacitus.dnp.scenario.Sound;
 import com.tacitus.dnp.widget.ColorChooserDialog;
 import com.tacitus.dnp.widget.DnpColor;
 import com.tacitus.dnp.widget.DrawingView;
@@ -49,6 +51,7 @@ public class Dnp extends Activity implements View.OnClickListener, ColorChooserD
     private TextView mAlphaChooserTitle;
     private ActionBarDrawerToggle mDrawerToggle;
     private int RESULT_LOAD_IMAGE = 1;
+    private int RESULT_SCENARIO_CHOOSER = 2;
     private ColorChooserDialog mColorChooserDialog;
 
 
@@ -160,6 +163,8 @@ public class Dnp extends Activity implements View.OnClickListener, ColorChooserD
         mAlphaChooser.setProgress(getResources().getInteger(R.integer.initial_alpha));
 
         mColorChooserDialog = new ColorChooserDialog(this, this);
+        // TODO: To delete, currently force display of scenario chooser
+//        chooseScenario();
 
     }
 
@@ -264,6 +269,14 @@ public class Dnp extends Activity implements View.OnClickListener, ColorChooserD
                 }
             }
         }
+        if (requestCode == RESULT_SCENARIO_CHOOSER && resultCode == RESULT_OK && data != null) {
+            Parcelable[] parcelables = data.getExtras().getParcelableArray("sounds");
+            Sound[] sounds = new Sound[parcelables.length];
+            for(int i=0;i<parcelables.length;i++){
+                sounds[i] = ((Sound) parcelables[i]);
+                Log.e(sounds[i].toString());
+            }
+        }
     }
 
     @Override
@@ -298,6 +311,9 @@ public class Dnp extends Activity implements View.OnClickListener, ColorChooserD
             case R.id.reset_color_order_btn:
                 mDrawView.resetColorOrder();
                 return true;
+            case R.id.choose_scenario_btn:
+                chooseScenario();
+                return true;
             case R.id.undo_btn:
                 mDrawView.undo();
                 return true;
@@ -307,6 +323,11 @@ public class Dnp extends Activity implements View.OnClickListener, ColorChooserD
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void chooseScenario() {
+        Intent intent = new Intent(this, ScenarioChooser.class);
+        startActivityForResult(intent, RESULT_SCENARIO_CHOOSER);
     }
 
     private void loadDrawing() {

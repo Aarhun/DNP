@@ -7,6 +7,7 @@
     <string name="brush_size_old_tablet">Épaisseur du trait\n(compatibilité):</string>
     <string name="brush_size">Épaisseur du trait:</string>
     <string name="choose_color">Choisissez une couleur</string>
+    <string name="choose_scenario">Choisissez un scénario</string>
     <string name="clear_color">EFFACER</string>
     <string name="color_chooser_dialog_message">Choisissez une couleur:</string>
     <string name="color_chooser_dialog_title">Sélecteur de couleur</string>
@@ -15,6 +16,8 @@
     <string name="dnp_sun">SOLEIL DNP</string>
     <string name="drawer_close">Fermer</string>
     <string name="drawer_open">Ouvrir</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="erase_mode_text">Mode effacement:</string>
     <string name="erase">Effacer</string>
     <string name="green">Vert</string>
@@ -42,6 +45,7 @@
     <string name="save_dialog_title">Sauvegarder le dessin</string>
     <string name="save">Sauver</string>
     <string name="start_new">Nouveau</string>
+    <string name="title_activity_scenario_chooser">ScenarioChooser</string>
     <string name="touch_size_text">Mode épaisseur du trait\npar contact:</string>
     <string name="underline_text">Mode souligné:</string>
     <string name="undo">Annuler le dernier trait</string>
