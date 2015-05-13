@@ -146,6 +146,7 @@ public class DrawingView extends View {
         Assert.assertNotNull(resources);
         mCanvasPaint = new Paint(Paint.DITHER_FLAG);
         setBrushSize(resources.getInteger(R.integer.initial_size) * 2);
+        setPaintAlpha(R.integer.initial_alpha);
         mHandler = new Handler();
     }
 
