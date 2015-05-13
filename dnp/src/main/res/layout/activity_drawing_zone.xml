@@ -5,6 +5,23 @@
     android:background="#FFCCCCCC"
     android:orientation="vertical" >
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginTop="3dp"
+            android:background="#FF000000"
+            android:orientation="horizontal" >
+            <TextView
+                android:id="@id/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:textSize="50sp"
+                android:textStyle="bold"/>
+        </LinearLayout>
+
         <com.tacitus.dnp.widget.DrawingView
             android:id="@+id/drawing"
             android:layout_width="match_parent"
@@ -15,6 +32,38 @@
             android:layout_marginTop="3dp"
             android:layout_weight="1"
             android:background="#FFFFFFFF" />
+
+        <LinearLayout
+            android:id="@+id/navigator"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FF000000"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginBottom="3dp"
+            android:orientation="horizontal" >
+            <Button
+                android:id="@+id/prev_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:background="@android:drawable/ic_media_previous"
+                android:layout_gravity="start"
+                />
+            <android.widget.Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"/>
+
+            <Button
+                android:id="@+id/next_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="5dp"
+                android:background="@android:drawable/ic_media_next"
+                android:layout_gravity="end"
+                />
+        </LinearLayout>
 
     </LinearLayout>
 

@@ -19,6 +19,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tacitus.dnp.scenario.Sound;
@@ -38,6 +40,9 @@ public class DrawingZone extends Activity implements View.OnClickListener, Color
     private int RESULT_LOAD_IMAGE = 1;
     private int RESULT_SCENARIO_CHOOSER = 2;
     private ColorChooserDialog mColorChooserDialog;
+    private Button mPrevButton;
+    private Button mNextButton;
+    private TextView mTitle;
 
 
     @Override
@@ -55,6 +60,16 @@ public class DrawingZone extends Activity implements View.OnClickListener, Color
 
         mDrawView = (DrawingView)findViewById(R.id.drawing);
 
+        mPrevButton = (Button) findViewById(R.id.prev_button);
+        mPrevButton.setOnClickListener(this);
+        mPrevButton.setEnabled(false);
+        mNextButton = (Button) findViewById(R.id.next_button);
+        mNextButton.setOnClickListener(this);
+
+        mTitle = (TextView) findViewById(R.id.title);
+        mTitle.setTextColor(getResources().getColor(android.R.color.white));
+        updateTitle();
+
         mColorChooserDialog = new ColorChooserDialog(this, this);
         // TODO: To delete, currently force display of scenario chooser
 //        chooseScenario();
@@ -62,10 +77,23 @@ public class DrawingZone extends Activity implements View.OnClickListener, Color
     }
 
 
+
     @Override
     public void onClick(View view){
-    }
+        if (view == mPrevButton) {
+            mDrawView.previousStep();
+            updateTitle();
+            if (mDrawView.getCurrentStepCursor() == 1) {
+                mPrevButton.setEnabled(false);
+            }
+        } else if (view == mNextButton){
+            mPrevButton.setEnabled(true);
+            mDrawView.nextStep();
+            updateTitle();
+        }
 
+
+    }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -256,6 +284,11 @@ public class DrawingZone extends Activity implements View.OnClickListener, Color
         });
         newDialog.show();
 
+    }
+
+    private void updateTitle() {
+        int currentStep = mDrawView.getCurrentStepCursor();
+        mTitle.setText(getResources().getString(R.string.step_title) + " " + currentStep);
     }
 
     @Override

@@ -114,8 +114,11 @@ public class DrawingView extends View {
     private SparseArray<DrawPath> mDrawPaths = new SparseArray<DrawPath>();
     private SparseArray<Integer> mDrawPaintColors = new SparseArray<Integer>();
     private ArrayList<DrawPath> mDrawPathsHistory = new ArrayList<DrawPath>();
+    private SparseArray<ArrayList<DrawPath>> mStepsHistory = new SparseArray<ArrayList<DrawPath>>();
     private ArrayList<DrawPath> mDrawPathsRedoable = new ArrayList<DrawPath>();
     private int mCurrentColorCursor;
+
+    private int mCurrentStepCursor = 1;
 
     private final int HOLLOW_LINE_THICKNESS_RATIO = 20;
 
@@ -299,6 +302,10 @@ public class DrawingView extends View {
         return null;
     }
 
+    public int getCurrentStepCursor() {
+        return mCurrentStepCursor;
+    }
+
 
     public void setColor(String newColor){
         //set color
@@ -353,6 +360,31 @@ public class DrawingView extends View {
         mDrawCanvas.drawColor(0, PorterDuff.Mode.CLEAR);
         mDrawPathsHistory.clear();
         resetColorOrder();
+        invalidate();
+    }
+
+    public void nextStep(){
+        mStepsHistory.put(mCurrentStepCursor, new ArrayList<DrawPath>(mDrawPathsHistory));
+        mCurrentStepCursor++;
+        startStep();
+    }
+
+    public void previousStep() {
+        if(mCurrentStepCursor > 1) {
+            mStepsHistory.put(mCurrentStepCursor, new ArrayList<DrawPath>(mDrawPathsHistory));
+            mCurrentStepCursor--;
+            startStep();
+        }
+    }
+
+    private void startStep() {
+        mDrawCanvas.drawColor(0, PorterDuff.Mode.CLEAR);
+        if (mStepsHistory.get(mCurrentStepCursor) == null) {
+            mDrawPathsHistory.clear();
+        } else {
+            mDrawPathsHistory = mStepsHistory.get(mCurrentStepCursor);
+            redrawAllPaths();
+        }
         invalidate();
     }
 
