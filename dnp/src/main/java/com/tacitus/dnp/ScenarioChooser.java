@@ -9,6 +9,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.GridLayout;
 
+import com.tacitus.dnp.scenario.AddImageView;
 import com.tacitus.dnp.scenario.SoundImageView;
 
 public class ScenarioChooser extends Activity {
@@ -23,6 +24,7 @@ public class ScenarioChooser extends Activity {
 
         mContentView = (GridLayout) findViewById(R.id.vertical_layout);
         mContentView.setUseDefaultMargins(true);
+        mContentView.addView(new AddImageView(this));
 
 
     }
@@ -50,7 +52,7 @@ public class ScenarioChooser extends Activity {
             case R.id.ok_btn:
                 Intent intent = new Intent();
                 Parcelable[] parcelables = new Parcelable[mContentView.getChildCount()];
-                for (int i=0; i<mContentView.getChildCount(); i++) {
+                for (int i=0; i<mContentView.getChildCount() - 1; i++) {
                     parcelables[i] = ((SoundImageView)mContentView.getChildAt(i)).getSound();
                 }
                 intent.putExtra("sounds", parcelables);
@@ -63,9 +65,9 @@ public class ScenarioChooser extends Activity {
     }
 
 
-    private void addNextItem() {
+    public void addNextItem() {
         SoundImageView soundImageView = new SoundImageView(this);
-        mContentView.addView(soundImageView);
+        mContentView.addView(soundImageView, mContentView.getChildCount() - 1);
         soundImageView.setText(String.valueOf(mContentView.getChildCount()));
         mContentView.invalidate();
     }

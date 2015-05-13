@@ -53,4 +53,13 @@
     <string name="underline_text">Underline mode:</string>
     <string name="undo">Cancel last draw</string>
     <string name="yellow">Yellow</string>
+    <string name="int_dark_green">-14391260</string>
+    <string name="int_green">-13463502</string>
+    <string name="int_light_green">-12137658</string>
+    <string name="int_red">-2675411</string>
+    <string name="int_light_brown">-3837106</string>
+    <string name="int_dark_brown">-14391260</string>
+    <string name="int_blue">-13156710</string>
+    <string name="int_yellow">-465067</string>
+    <string name="int_grey">-4079167</string>
 </resources>

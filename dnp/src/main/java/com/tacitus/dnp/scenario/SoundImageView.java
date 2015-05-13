@@ -158,16 +158,8 @@ public class SoundImageView extends ImageView {
         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                String title = (String) item.getTitle();
-                if (title.equals("RED")) {
-                    setColor(0xffff0000);
-                }
-                if (title.equals("GREEN")) {
-                    setColor(0xff00ff00);
-                }
-                if (title.equals("BLUE")) {
-                    setColor(0xff0000ff);
-                }
+                int color = Integer.parseInt(item.getTitleCondensed().toString());
+                setColor(color);
                 return true;
             }
         });

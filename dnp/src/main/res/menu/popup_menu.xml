@@ -1,22 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:orientation="horizontal" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <item
-        android:id="@+id/red"
-        android:title="RED"
-        android:contentDescription="dark green" />
-
-    <item
-        android:id="@+id/blue"
-        android:title="BLUE"
-        android:contentDescription="blue color" />
+        android:id="@+id/dark_green"
+        android:title="@string/dark_green"
+        android:titleCondensed="@string/int_dark_green"
+        android:icon="@color/dark_green"/>
 
     <item
         android:id="@+id/green"
-        android:title="GREEN"
-        android:contentDescription="green color" />
+        android:title="@string/green"
+        android:titleCondensed="@string/int_green"
+        android:icon="@color/green"/>
+
+    <item
+        android:id="@+id/light_green"
+        android:title="@string/light_green"
+        android:titleCondensed="@string/int_green"
+        android:icon="@color/light_green"/>
+
+    <item
+        android:id="@+id/red"
+        android:title="@string/red"
+        android:titleCondensed="@string/int_red"
+        android:icon="@color/red"/>
+
+    <item
+        android:id="@+id/light_brown"
+        android:title="@string/light_brown"
+        android:titleCondensed="@string/int_light_brown"
+        android:icon="@color/light_brown"/>
+
+    <item
+        android:id="@+id/dark_brown"
+        android:title="@string/dark_brown"
+        android:titleCondensed="@string/int_dark_brown"
+        android:icon="@color/dark_brown"/>
+
+    <item
+        android:id="@+id/blue"
+        android:title="@string/blue"
+        android:titleCondensed="@string/int_blue"
+        android:icon="@color/blue"/>
+
+    <item
+        android:id="@+id/yellow"
+        android:title="@string/yellow"
+        android:titleCondensed="@string/int_yellow"
+        android:icon="@color/yellow"/>
+
+    <item
+        android:id="@+id/grey"
+        android:title="@string/grey"
+        android:titleCondensed="@string/int_grey"
+        android:icon="@color/grey"/>
+
 
 </menu>
