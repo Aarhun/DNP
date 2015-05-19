@@ -1,1 +1,3 @@
 include ':dnp', ':widget'
+include ':materialDesign'
+include ':materialDesign'
