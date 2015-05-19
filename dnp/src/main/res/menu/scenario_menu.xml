@@ -3,21 +3,13 @@
 <menu xmlns:tools="http://schemas.android.com/tools"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-
-
-    <item
-        android:id="@+id/new_btn"
-        android:icon="@android:drawable/ic_menu_add"
-        android:title="@string/start_new"
-        android:showAsAction="always"
-        tools:ignore="AppCompatResource" />
-
-
     <item
         android:id="@+id/ok_btn"
         android:icon="@android:drawable/ic_menu_send"
         android:title="@string/save"
         android:showAsAction="always"
         tools:ignore="AppCompatResource" />
+
+
 
 </menu>

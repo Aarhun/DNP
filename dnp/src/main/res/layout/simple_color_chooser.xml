@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/color_chooser_layout"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:layout_weight="1"
+    android:background="@android:color/background_dark">
+
+    <ImageView
+        android:id="@+id/color_chooser_background"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:background="@drawable/dnp_sun_color_chooser_background"/>
+
+    <ImageView
+        android:id="@+id/color_chooser"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:visibility="invisible"
+        android:background="@drawable/dnp_sun_color_chooser"/>
+</RelativeLayout>

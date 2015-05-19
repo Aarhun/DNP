@@ -4,16 +4,26 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.GridLayout;
+import android.view.View;
 
-import com.tacitus.dnp.scenario.AddImageView;
-import com.tacitus.dnp.scenario.SoundImageView;
+import com.tacitus.dnp.scenario.Step;
+import com.tacitus.dnp.scenario.StepAdapter;
+import com.tacitus.dnp.scenario.StepView;
+
+import java.util.ArrayList;
+
 
 public class ScenarioChooser extends Activity {
-    private GridLayout mContentView;
+    private RecyclerView mContentView;
+    private StepAdapter mAdapter;
+    private ArrayList<Step> mDataSet;
+
 
 
     @Override
@@ -22,10 +32,25 @@ public class ScenarioChooser extends Activity {
 
         setContentView(R.layout.activity_scenario_chooser);
 
-        mContentView = (GridLayout) findViewById(R.id.vertical_layout);
-        mContentView.setUseDefaultMargins(true);
-        mContentView.addView(new AddImageView(this));
+        mContentView = (RecyclerView) findViewById(R.id.recycler_view);
+        mContentView.setHasFixedSize(true);
 
+        com.gc.materialdesign.views.ButtonFloat buttonFloat = (com.gc.materialdesign.views.ButtonFloat) findViewById(R.id.buttonFloat);
+        buttonFloat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addNextItem();
+            }
+        });
+
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+        mContentView.setLayoutManager(layoutManager);
+
+        mDataSet = new ArrayList<Step>();
+
+        mAdapter = new StepAdapter(mDataSet);
+        mContentView.setAdapter(mAdapter);
+        mContentView.setItemAnimator(new DefaultItemAnimator());
 
     }
 
@@ -46,16 +71,13 @@ public class ScenarioChooser extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle presses on the action bar items
         switch (item.getItemId()) {
-            case R.id.new_btn:
-                addNextItem();
-                return true;
             case R.id.ok_btn:
                 Intent intent = new Intent();
                 Parcelable[] parcelables = new Parcelable[mContentView.getChildCount()];
-                for (int i=0; i<mContentView.getChildCount() - 1; i++) {
-                    parcelables[i] = ((SoundImageView)mContentView.getChildAt(i)).getSound();
+                for (int i=0; i<mContentView.getChildCount(); i++) {
+                    parcelables[i] = ((StepView)mContentView.getChildAt(i)).getStep();
                 }
-                intent.putExtra("sounds", parcelables);
+                intent.putExtra("Steps", parcelables);
                 setResult(RESULT_OK, intent);
                 finish();
                 return true;
@@ -66,10 +88,20 @@ public class ScenarioChooser extends Activity {
 
 
     public void addNextItem() {
-        SoundImageView soundImageView = new SoundImageView(this);
-        mContentView.addView(soundImageView, mContentView.getChildCount() - 1);
-        soundImageView.setText(String.valueOf(mContentView.getChildCount()));
-        mContentView.invalidate();
+        Step step = new Step(String.valueOf(mContentView.getChildCount()));
+        mDataSet.add(step);
+        mAdapter.notifyItemInserted(mAdapter.getItemCount());
+    }
+
+    public void addItemAt(Step step, int index){
+        mDataSet.add(index, step);
+        mAdapter.notifyItemInserted(index);
+    }
+
+    public void deleteItem(Step step) {
+        int position = mDataSet.indexOf(step);
+        mDataSet.remove(step);
+        mAdapter.notifyItemRemoved(position);
     }
 
 }
