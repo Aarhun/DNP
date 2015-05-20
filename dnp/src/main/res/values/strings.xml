@@ -54,7 +54,12 @@
     <string name="save">Save</string>
     <string name="scenario_button_title">Choose or create a scenario</string>
     <string name="start_new">New</string>
+    <string name="step_delete">To delete step</string>
+    <string name="step_hollow">Hollow</string>
+    <string name="step_syllable">Syllable</string>
+    <string name="step_text_linked_down">LINKED</string>
     <string name="step_title">STEP</string>
+    <string name="step_underline">Underline</string>
     <string name="title_activity_drawing_zone">Drawing Zone</string>
     <string name="title_activity_scenario_chooser">Create a scenario</string>
     <string name="touch_size_text">Touch size mode:</string>
