@@ -1,6 +1,5 @@
 package com.tacitus.dnp.scenario;
 
-import android.app.Activity;
 import android.content.ClipData;
 import android.content.Context;
 import android.graphics.PorterDuff;
@@ -9,17 +8,13 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.DisplayMetrics;
+import android.util.AttributeSet;
 import android.view.DragEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.tacitus.dnp.R;
 import com.tacitus.dnp.ScenarioChooser;
@@ -34,103 +29,13 @@ public class StepView extends CardView implements SimpleColorChooserDialog.Simpl
     private EditText mText;
     private SimpleColorChooserDialog mColorChooserDialog;
     private ImageView mChooseColor;
-    private TextView mTitle;
     private CheckBox mLinkedDown;
 
-    public StepView(Context context, int stepNumber) {
-        super(context);
+    public StepView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+		setUseCompatPadding(true);
         mContext = context;
         mStep = new Step();
-        mTitle = new TextView(mContext);
-        mTitle.setText(getResources().getString(R.string.step_title) + ": " + String.valueOf(stepNumber));
-        mTitle.setTextSize(20);
-        LayoutParams layoutParamsTitle = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        addView(mTitle, layoutParamsTitle);
-        LayoutParams layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-        setLayoutParams(layoutParams);
-        LinearLayout linearLayout = (LinearLayout) ((Activity) mContext).getLayoutInflater().inflate(R.layout.step, null);
-        mHollowMode = (CheckBox) linearLayout.findViewById(R.id.hollow);
-        mUnderlineMode = (CheckBox) linearLayout.findViewById(R.id.underline);
-        mLinkedDown = (CheckBox) linearLayout.findViewById(R.id.link_down);
-        mText = (EditText) linearLayout.findViewById(R.id.soundText);
-        mChooseColor = (ImageView) linearLayout.findViewById(R.id.chooseColor);
-
-        Button deleteButton = (Button) linearLayout.findViewById(R.id.delete);
-        deleteButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ((ScenarioChooser) mContext).deleteItem(mStep);
-            }
-        });
-
-        mChooseColor.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mColorChooserDialog.show();
-            }
-        });
-
-
-
-        mText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                mStep.setText(s.toString());
-            }
-        });
-
-        mHollowMode.setOnCheckedChangeListener(new CheckBox.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                mStep.getLine().setHollow(isChecked);
-            }
-        });
-
-
-        mUnderlineMode.setOnCheckedChangeListener(new CheckBox.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                mStep.getLine().setUnderline(isChecked);
-            }
-        });
-
-        mLinkedDown.setOnCheckedChangeListener(new CheckBox.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    mStep.setLinkedDown(isChecked);
-            }
-        });
-
-
-        mColorChooserDialog = new SimpleColorChooserDialog(mContext, this);
-
-
-        addView(linearLayout);
-        setupImageView();
-
-        // Used to set height of color indicator dynamically
-
-        DisplayMetrics metrics = new DisplayMetrics();
-        ((Activity) mContext).getWindow().getWindowManager().getDefaultDisplay().getMetrics(metrics);
-
-        this.measure(View.MeasureSpec.makeMeasureSpec(metrics.widthPixels, MeasureSpec.EXACTLY),
-                View.MeasureSpec.makeMeasureSpec(metrics.heightPixels, View.MeasureSpec.EXACTLY));
-        int realWidth = this.getMeasuredWidth();
-
-        mText.setMinimumWidth(realWidth / 3);
-        mChooseColor.setMinimumWidth(realWidth / 3);
-        //----------------------------------------
-        invalidate();
     }
 
 
@@ -144,13 +49,12 @@ public class StepView extends CardView implements SimpleColorChooserDialog.Simpl
 
     public void setStep(Step step) {
         this.mStep = step;
-        Drawable drawable = mChooseColor.getBackground();
+        Drawable drawable = mContext.getResources().getDrawable(R.drawable.step_color_indicator);
         drawable.setColorFilter(step.getLine().getColor(), PorterDuff.Mode.MULTIPLY);
         mChooseColor.setBackground(drawable);
         mHollowMode.setChecked(step.getLine().isHollow());
         mUnderlineMode.setChecked(step.getLine().isUnderline());
         mText.setText(step.getText());
-        mTitle.setText(step.getTitle());
         mLinkedDown.setChecked(step.getLinkedDown());
     }
 
@@ -173,9 +77,71 @@ public class StepView extends CardView implements SimpleColorChooserDialog.Simpl
         mStep.getLine().setUnderline(underline);
     }
 
-    private void setupImageView() {
-        DisplayMetrics metrics = new DisplayMetrics();
-        ((Activity)mContext).getWindow().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+    public void setupImageView() {
+		mHollowMode = (CheckBox) findViewById(R.id.hollow);
+		mUnderlineMode = (CheckBox) findViewById(R.id.underline);
+		mLinkedDown = (CheckBox) findViewById(R.id.link_down);
+		mText = (EditText) findViewById(R.id.soundText);
+		mChooseColor = (ImageView) findViewById(R.id.chooseColor);
+
+		ImageView deleteButton = (ImageView) findViewById(R.id.delete);
+		deleteButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				((ScenarioChooser) mContext).deleteItem(mStep);
+			}
+		});
+
+		mChooseColor.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				mColorChooserDialog.show();
+			}
+		});
+
+
+
+		mText.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				mStep.setText(s.toString());
+			}
+		});
+
+		mHollowMode.setOnCheckedChangeListener(new CheckBox.OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				mStep.getLine().setHollow(isChecked);
+			}
+		});
+
+
+		mUnderlineMode.setOnCheckedChangeListener(new CheckBox.OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				mStep.getLine().setUnderline(isChecked);
+			}
+		});
+
+		mLinkedDown.setOnCheckedChangeListener(new CheckBox.OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				mStep.setLinkedDown(isChecked);
+			}
+		});
+
+
+		mColorChooserDialog = new SimpleColorChooserDialog(mContext, this);
 
         setOnDragListener(new OnDragListener() {
             @Override

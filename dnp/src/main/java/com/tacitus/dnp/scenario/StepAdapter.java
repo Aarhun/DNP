@@ -1,7 +1,10 @@
 package com.tacitus.dnp.scenario;
 
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.ViewGroup;
+
+import com.tacitus.dnp.R;
 
 import java.util.ArrayList;
 
@@ -24,7 +27,8 @@ public class StepAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-        StepView v = new StepView(viewGroup.getContext(), getItemCount());
+		StepView v = (StepView) LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.step, viewGroup, false);
+		v.setupImageView();
         ViewHolder vh = new ViewHolder(v);
         return vh;
     }

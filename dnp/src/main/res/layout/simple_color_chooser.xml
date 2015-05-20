@@ -16,7 +16,8 @@
         android:layout_gravity="center"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
-        android:background="@drawable/dnp_sun_color_chooser_background"/>
+        android:src="@drawable/dnp_sun_color_chooser_background"
+        android:adjustViewBounds="true"/>
 
     <ImageView
         android:id="@+id/color_chooser"
@@ -26,5 +27,6 @@
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
         android:visibility="invisible"
-        android:background="@drawable/dnp_sun_color_chooser"/>
+        android:src="@drawable/dnp_sun_color_chooser"
+        android:adjustViewBounds="true"/>
 </RelativeLayout>
