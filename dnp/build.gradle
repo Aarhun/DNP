@@ -10,10 +10,20 @@ android {
         versionCode 1
         versionName "1.0"
     }
+
+
+    signingConfigs {
+        tacitusRelease {
+            storeFile file(rootDir.getPath() + "/dnp/keystore.jks")
+            storePassword "tacitus"
+            keyAlias "tacitus"
+            keyPassword "tacitus"
+        }
+    }
+
     buildTypes {
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+            signingConfig signingConfigs.tacitusRelease
         }
     }
 }
