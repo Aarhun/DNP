@@ -29,6 +29,12 @@ public class Line implements Parcelable {
         mColor = color;
     }
 
+    public Line(int color, boolean hollow, boolean underline) {
+        mHollow = hollow;
+        mUnderline = underline;
+        mColor = color;
+    }
+
     public Line(int a, int r, int g, int b) {
         mHollow = false;
         mUnderline = false;

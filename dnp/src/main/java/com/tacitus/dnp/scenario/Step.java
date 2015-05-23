@@ -12,9 +12,9 @@ public class Step implements Parcelable {
 
     public Step(Parcel in) {
         mTitle = in.readString();
-        mSound = in.readParcelable(Line.class.getClassLoader());
-        mLinkedDown = (Boolean) in.readValue(Boolean.class.getClassLoader());
+        mSound = in.readParcelable(Sound.class.getClassLoader());
         mLinkedUp = (Boolean) in.readValue(Boolean.class.getClassLoader());
+        mLinkedDown = (Boolean) in.readValue(Boolean.class.getClassLoader());
     }
 
     public Step() {
@@ -43,6 +43,20 @@ public class Step implements Parcelable {
         mSound = new Sound(color, text);
         mLinkedDown = linkedDown;
         mLinkedUp = linkedUp;
+    }
+
+    public Step(Boolean linkedDown, Boolean linkedUp, Sound sound, String title) {
+        mLinkedDown = linkedDown;
+        mLinkedUp = linkedUp;
+        mSound = new Sound(sound);
+        mTitle = title;
+    }
+
+    public Step(Step step) {
+        mTitle = step.getTitle();
+        mLinkedDown = step.getLinkedDown();
+        mLinkedUp = step.getLinkedUp();
+        mSound = step.getSound();
     }
 
     public Sound getSound() {
@@ -100,8 +114,8 @@ public class Step implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeParcelable(mSound, flags);
         dest.writeString(mTitle);
+        dest.writeParcelable(mSound, flags);
         dest.writeValue(mLinkedUp);
         dest.writeValue(mLinkedDown);
     }

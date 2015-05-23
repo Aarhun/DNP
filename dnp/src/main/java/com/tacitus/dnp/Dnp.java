@@ -4,6 +4,7 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.view.MenuItem;
@@ -13,9 +14,12 @@ import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.tacitus.dnp.scenario.Step;
 import com.tacitus.dnp.widget.DnpColor;
 
 import junit.framework.Assert;
+
+import java.util.ArrayList;
 
 public class Dnp extends Activity implements View.OnClickListener {
 
@@ -29,17 +33,21 @@ public class Dnp extends Activity implements View.OnClickListener {
     private TextView mAlphaChooserText;
     private TextView mAlphaChooserTitle;
     private ActionBarDrawerToggle mDrawerToggle;
-    private int RESULT_SCENARIO_CHOOSER = 1;
+    private int RESULT_SCENARIO_CHOOSER = 2;
     private Button mDrawButton;
     private Button mScenarioButton;
+    private ArrayList<Step> mSteps;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         new DnpColor(this);
+        mSteps = new ArrayList<Step>();
 
         setContentView(R.layout.activity_dnp);
+
+        Path.createPublicAppPath();
 
         // Initialize the drawer menu
         DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -265,14 +273,37 @@ public class Dnp extends Activity implements View.OnClickListener {
         return false;
     }
 
+    private void addStepsToIntent(Intent intent) {
+        Parcelable[] parcelables = new Parcelable[mSteps.size()];
+        for (int i=0; i<mSteps.size(); i++) {
+            parcelables[i] = mSteps.get(i);
+        }
+        intent.putExtra("steps", parcelables);
+    }
+
     private void chooseScenario() {
         Intent intent = new Intent(this, ScenarioChooser.class);
+        addStepsToIntent(intent);
         startActivityForResult(intent, RESULT_SCENARIO_CHOOSER);
     }
 
     private void startDrawing() {
         Intent intent = new Intent(this, DrawingZone.class);
+        addStepsToIntent(intent);
         startActivity(intent);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == RESULT_SCENARIO_CHOOSER && resultCode == RESULT_OK && data != null) {
+            mSteps.clear();
+            Parcelable[] parcelables = data.getExtras().getParcelableArray("steps");
+            for (int i = 0; i < parcelables.length; i++) {
+                mSteps.add((Step) parcelables[i]);
+            }
+        }
     }
 
 }

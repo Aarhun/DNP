@@ -18,6 +18,16 @@ public class Sound implements Parcelable{
         mLine = new Line();
     }
 
+    public Sound(String text, Line line) {
+        mText = text;
+        mLine = line;
+    }
+
+    public Sound(Sound sound) {
+        mText = sound.getText();
+        mLine = sound.getLine();
+    }
+
     public Sound(int color, String text) {
         mText = text;
         mLine = new Line(color);

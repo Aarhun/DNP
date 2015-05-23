@@ -23,32 +23,30 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.tacitus.dnp.scenario.Sound;
-import com.tacitus.dnp.widget.ColorChooserDialog;
-import com.tacitus.dnp.widget.DnpColor;
+import com.tacitus.dnp.scenario.Step;
 import com.tacitus.dnp.widget.DrawingView;
 
 import junit.framework.Assert;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
 import java.util.UUID;
 
-public class DrawingZone extends Activity implements View.OnClickListener, ColorChooserDialog.ColorChooser {
+public class DrawingZone extends Activity implements View.OnClickListener {
 
     private DrawingView mDrawView;
     private int RESULT_LOAD_IMAGE = 1;
     private int RESULT_SCENARIO_CHOOSER = 2;
-    private ColorChooserDialog mColorChooserDialog;
     private Button mPrevButton;
     private Button mNextButton;
     private TextView mTitle;
+    private ArrayList<Step> mSteps;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        new DnpColor(this);
 
         setContentView(R.layout.activity_drawing_zone);
 
@@ -58,21 +56,30 @@ public class DrawingZone extends Activity implements View.OnClickListener, Color
         actionBar.setHomeButtonEnabled(true);
         //----------------------------------------
 
+        mSteps = new ArrayList<Step>();
+        Intent data = getIntent();
+        if (data.getExtras() != null) {
+            Parcelable[] parcelables = data.getExtras().getParcelableArray("steps");
+            for (int i = 0; i < parcelables.length; i++) {
+                mSteps.add(((Step) parcelables[i]));
+            }
+        }
+
         mDrawView = (DrawingView)findViewById(R.id.drawing);
+        mDrawView.setScenario(mSteps);
 
         mPrevButton = (Button) findViewById(R.id.prev_button);
         mPrevButton.setOnClickListener(this);
         mPrevButton.setEnabled(false);
         mNextButton = (Button) findViewById(R.id.next_button);
         mNextButton.setOnClickListener(this);
+        if(mSteps.isEmpty()){
+            mNextButton.setEnabled(false);
+        }
 
         mTitle = (TextView) findViewById(R.id.title);
         mTitle.setTextColor(getResources().getColor(android.R.color.white));
         updateTitle();
-
-        mColorChooserDialog = new ColorChooserDialog(this, this);
-        // TODO: To delete, currently force display of scenario chooser
-//        chooseScenario();
 
     }
 
@@ -81,14 +88,18 @@ public class DrawingZone extends Activity implements View.OnClickListener, Color
     @Override
     public void onClick(View view){
         if (view == mPrevButton) {
+            mNextButton.setEnabled(true);
             mDrawView.previousStep();
-            updateTitle();
-            if (mDrawView.getCurrentStepCursor() == 1) {
+            if (mDrawView.getCurrentStepCursor() == 0) {
                 mPrevButton.setEnabled(false);
             }
+            updateTitle();
         } else if (view == mNextButton){
             mPrevButton.setEnabled(true);
             mDrawView.nextStep();
+            if (mDrawView.getCurrentStepCursor() == mSteps.size() - 1){
+                mNextButton.setEnabled(false);
+            }
             updateTitle();
         }
 
@@ -120,11 +131,14 @@ public class DrawingZone extends Activity implements View.OnClickListener, Color
             }
         }
         if (requestCode == RESULT_SCENARIO_CHOOSER && resultCode == RESULT_OK && data != null) {
-            Parcelable[] parcelables = data.getExtras().getParcelableArray("sounds");
-            Sound[] sounds = new Sound[parcelables.length];
+            mSteps.clear();
+            Parcelable[] parcelables = data.getExtras().getParcelableArray("steps");
             for(int i=0;i<parcelables.length;i++){
-                sounds[i] = ((Sound) parcelables[i]);
-                Log.e(sounds[i].toString());
+                mSteps.add((Step) parcelables[i]);
+            }
+            mDrawView.setScenario(mSteps);
+            if(!mSteps.isEmpty()) {
+                mNextButton.setEnabled(true);
             }
         }
     }
@@ -150,12 +164,6 @@ public class DrawingZone extends Activity implements View.OnClickListener, Color
             case R.id.load_btn:
                 loadDrawing();
                 return true;
-            case R.id.choose_color_btn:
-                mColorChooserDialog.show();
-                return true;
-            case R.id.reset_color_order_btn:
-                mDrawView.resetColorOrder();
-                return true;
             case R.id.choose_scenario_btn:
                 chooseScenario();
                 return true;
@@ -172,6 +180,11 @@ public class DrawingZone extends Activity implements View.OnClickListener, Color
 
     private void chooseScenario() {
         Intent intent = new Intent(this, ScenarioChooser.class);
+        Parcelable[] parcelables = new Parcelable[mSteps.size()];
+        for (int i=0; i<mSteps.size(); i++) {
+            parcelables[i] = mSteps.get(i);
+        }
+        intent.putExtra("steps", parcelables);
         startActivityForResult(intent, RESULT_SCENARIO_CHOOSER);
     }
 
@@ -287,17 +300,7 @@ public class DrawingZone extends Activity implements View.OnClickListener, Color
     }
 
     private void updateTitle() {
-        int currentStep = mDrawView.getCurrentStepCursor();
+        int currentStep = mDrawView.getCurrentStepCursor() + 1;
         mTitle.setText(getResources().getString(R.string.step_title) + " " + currentStep);
-    }
-
-    @Override
-    public void onChangeColor(String stringColor, int id) {
-        mDrawView.setColor(stringColor, id);
-    }
-
-    @Override
-    public void onClearColor(int id) {
-        mDrawView.clearColor(id);
     }
 }

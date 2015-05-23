@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="int_blue">-13156710</integer>
+    <integer name="int_dark_brown">-14391260</integer>
+    <integer name="int_dark_green">-14391260</integer>
+    <integer name="int_green">-13463502</integer>
+    <integer name="int_grey">-4079167</integer>
+    <integer name="int_light_brown">-3837106</integer>
+    <integer name="int_light_green">-12137658</integer>
+    <integer name="int_red">-2675411</integer>
+    <integer name="int_yellow">-465067</integer>
+</resources>
