@@ -8,7 +8,8 @@
     <string name="brush_size">Brush size:</string>
     <string name="choose_color">Choose color</string>
     <string name="choose_scenario">Choose scenario</string>
-    <string name="clear_color">CLEAR</string>
+    <string name="clear">CLEAR</string>
+    <string name="clear_lower">Clear</string>
     <string name="color_chooser_dialog_message">Choose a color:</string>
     <string name="color_chooser_dialog_title">Color chooser</string>
     <string name="dark_brown">Dark Brown</string>

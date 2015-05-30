@@ -73,7 +73,7 @@ public class ColorChooserDialog extends Dialog implements View.OnClickListener {
         mPositiveButton.setOnClickListener(this);
 
         mClearButton = (Button) dialogView.findViewById(R.id.clear_button);
-        mClearButton.setText(context.getText(R.string.clear_color));
+        mClearButton.setText(context.getText(R.string.clear));
         mClearButton.setOnClickListener(this);
 
         mTypeButton = (ToggleButton) dialogView.findViewById(R.id.type_button);

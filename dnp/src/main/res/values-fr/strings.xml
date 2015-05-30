@@ -8,7 +8,8 @@
     <string name="brush_size">Épaisseur du trait:</string>
     <string name="choose_color">Choisissez une couleur</string>
     <string name="choose_scenario">Choisissez un scénario</string>
-    <string name="clear_color">EFFACER</string>
+    <string name="clear">EFFACER</string>
+    <string name="clear_lower">Effacer</string>
     <string name="color_chooser_dialog_message">Choisissez une couleur:</string>
     <string name="color_chooser_dialog_title">Sélecteur de couleur</string>
     <string name="dark_brown">Brun Foncé</string>

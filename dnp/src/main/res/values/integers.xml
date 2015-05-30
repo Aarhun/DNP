@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <integer name="base_stroke_size_multiplier">250</integer>
     <integer name="int_blue">-13156710</integer>
     <integer name="int_dark_brown">-14391260</integer>
     <integer name="int_dark_green">-14391260</integer>

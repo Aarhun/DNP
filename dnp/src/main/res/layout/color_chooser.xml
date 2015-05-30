@@ -199,7 +199,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="?android:attr/selectableItemBackground"
-                android:text="@string/clear_color"
+                android:text="@string/clear"
                 android:layout_gravity="center"
                 android:layout_weight="1"
                 />

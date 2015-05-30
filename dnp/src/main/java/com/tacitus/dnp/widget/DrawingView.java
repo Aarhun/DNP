@@ -202,11 +202,11 @@ public class DrawingView extends View {
         float touchMajorMax = motionRangeMajor.getMax();
         float touchMinorMax = motionRangeMinor.getMax();
 
-        float multiplier = 2700;
+        float multiplier = getResources().getInteger(R.integer.base_stroke_size_multiplier);
         if (mOldTabletMode) {
             multiplier *= mBrushSizeOldTablet;
         }
-        float size = (((event.getTouchMajor(index) / touchMajorMax) + (event.getTouchMinor(index) / touchMinorMax)) / 2) * multiplier;
+        float size = event.getPressure(index) * multiplier;
         float pressure = event.getPressure(index);
         DrawPath drawPath;
 
