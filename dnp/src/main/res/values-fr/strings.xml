@@ -38,6 +38,7 @@
     <string name="pressure_text">Mode pression:</string>
     <string name="red">Rouge</string>
     <string name="redo">Redessiner le dernier trait</string>
+    <string name="reset">Réinitialiser</string>
     <string name="reset_color_order">Remise à zéro de l\'ordre des couleurs</string>
     <string name="save_dialog_ko">Oops! L\'image n\'a pas pu être sauvegardée.</string>
     <string name="save_dialog_message">Sauvegarder le dessin dans la gallerie ?</string>
@@ -51,6 +52,9 @@
     <string name="scenario_new_dialog_message">Créer un nouveau scénario ? (Vous perdrez vos modifications actuelles)</string>
     <string name="scenario_save">Sauver le scénario</string>
     <string name="scenario_save_dialog_instruction">Veuillez entrer le nom du scénario:</string>
+    <string name="sizer_button_title">Calibrer l\'application</string>
+    <string name="sizer_dialog_title">Calibreur</string>
+    <string name="sizer_instructions">Veuillez toucher le carré blanc avec votre index.\nUtilisez ensuite le curseur pour modifier la taille du cercle noir qui devrait correspondre à la taille d\'un cercle dessiné par votre doigt.\n(Le rectangle noir est une suggestion de taille)</string>
     <string name="start_new">Nouveau</string>
     <string name="step_delete">Pour supprimer une étape</string>
     <string name="step_hollow">Creux</string>

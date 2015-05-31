@@ -38,6 +38,7 @@
     <string name="pressure_text">Pressure mode:</string>
     <string name="red">Red</string>
     <string name="redo">Redo last draw</string>
+    <string name="reset">Reset</string>
     <string name="reset_color_order">Reset color order</string>
     <string name="save_dialog_ko">Oops ! Image could not be saved.</string>
     <string name="save_dialog_message">Save drawing to device Gallery ?</string>
@@ -51,6 +52,9 @@
     <string name="scenario_new_dialog_message">Start new scenario ? (You will lose current modification)</string>
     <string name="scenario_save">Save the scenario</string>
     <string name="scenario_save_dialog_instruction">Please enter the name of the scenario:</string>
+    <string name="sizer_button_title">Calibrate the application</string>
+    <string name="sizer_dialog_title">Sizer</string>
+    <string name="sizer_instructions">Use your index finger to touch the white square below.\nThen use the slider to set the black circle at the wanted size which should fit the size of a circle drawn by your finger.\n(Black square size is a suggestion)</string>
     <string name="start_new">New</string>
     <string name="step_delete">To delete step</string>
     <string name="step_hollow">Hollow</string>

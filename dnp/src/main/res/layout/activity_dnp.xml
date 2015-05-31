@@ -40,6 +40,14 @@
         android:layout_gravity="center"
         />
 
+    <Button
+        android:id="@+id/sizer_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/sizer_button_title"
+        android:layout_gravity="center"
+        />
+
 </LinearLayout>
     </FrameLayout>
     <LinearLayout

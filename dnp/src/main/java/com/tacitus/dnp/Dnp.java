@@ -16,12 +16,16 @@ import android.widget.TextView;
 
 import com.tacitus.dnp.scenario.Step;
 import com.tacitus.dnp.widget.DnpColor;
+import com.tacitus.dnp.widget.SizerDialog;
 
 import junit.framework.Assert;
 
 import java.util.ArrayList;
 
 public class Dnp extends Activity implements View.OnClickListener {
+
+    public static final String MULTIPLIER_NAME = "multiplier";
+    public static final String CONFIG_FILE = "config";
 
     private SeekBar mBrushSizeChooserOldTablet;
     private TextView mBrushSizeChooserTextOldTablet;
@@ -36,8 +40,9 @@ public class Dnp extends Activity implements View.OnClickListener {
     private int RESULT_SCENARIO_CHOOSER = 2;
     private Button mDrawButton;
     private Button mScenarioButton;
+    private Button mSizerButton;
     private ArrayList<Step> mSteps;
-
+    private SizerDialog mSizerDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +82,8 @@ public class Dnp extends Activity implements View.OnClickListener {
         mDrawButton.setOnClickListener(this);
         mScenarioButton = (Button) findViewById(R.id.scenario_button);
         mScenarioButton.setOnClickListener(this);
+        mSizerButton = (Button) findViewById(R.id.sizer_button);
+        mSizerButton.setOnClickListener(this);
 
         mBrushSizeChooserText = (TextView)findViewById(R.id.brush_size_chooser_text);
         mBrushSizeChooserTitle = (TextView)findViewById(R.id.brush_size_chooser_title);
@@ -87,7 +94,7 @@ public class Dnp extends Activity implements View.OnClickListener {
         mBrushSizeChooser.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                Log.d("setBrushSize", progress*2);
+                Log.d("setBrushSize", progress * 2);
 //                mDrawView.setBrushSize(progress * 2);
                 mBrushSizeChooserText.setText(String.valueOf(progress));
             }
@@ -155,8 +162,8 @@ public class Dnp extends Activity implements View.OnClickListener {
         });
         mAlphaChooser.setProgress(getResources().getInteger(R.integer.initial_alpha));
 
-        // TODO: To delete, currently force display of scenario chooser
-//        chooseScenario();
+
+        mSizerDialog = new SizerDialog(this);
 
     }
 
@@ -250,6 +257,8 @@ public class Dnp extends Activity implements View.OnClickListener {
             startDrawing();
         } else if (view == mScenarioButton){
             chooseScenario();
+        } else if (view == mSizerButton){
+            mSizerDialog.show();
         }
 
 

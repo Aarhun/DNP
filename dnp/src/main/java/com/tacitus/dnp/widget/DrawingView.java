@@ -16,6 +16,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
+import com.tacitus.dnp.DrawingZone;
 import com.tacitus.dnp.R;
 import com.tacitus.dnp.Util;
 import com.tacitus.dnp.scenario.Step;
@@ -121,21 +122,19 @@ public class DrawingView extends View {
     private Paint mCanvasPaint;
     //canvas
     private Canvas mDrawCanvas;
-    private boolean mOldTabletMode = false;
 
     private Bitmap mCanvasBitmap;
     private Bitmap mLoadedBitmap;
 
-    private float mBrushSizeOldTablet;
-
-
     private Toast mNothingToUndo;
     private Toast mNothingToRedo;
     private Toast mNoColorSelected;
+    private Context mContext;
 
     public DrawingView(Context context, AttributeSet attrs){
         super(context, attrs);
         mCanvasPaint = new Paint(Paint.DITHER_FLAG);
+        mContext = context;
     }
 
     public void setScenario(ArrayList<Step> steps) {
@@ -202,10 +201,7 @@ public class DrawingView extends View {
         float touchMajorMax = motionRangeMajor.getMax();
         float touchMinorMax = motionRangeMinor.getMax();
 
-        float multiplier = getResources().getInteger(R.integer.base_stroke_size_multiplier);
-        if (mOldTabletMode) {
-            multiplier *= mBrushSizeOldTablet;
-        }
+        float multiplier = ((DrawingZone)mContext).getMultiplier();
         float size = event.getPressure(index) * multiplier;
         float pressure = event.getPressure(index);
         DrawPath drawPath;
@@ -341,15 +337,6 @@ public class DrawingView extends View {
         mDrawCanvas.drawBitmap(bitmap, 0, 0, null);
         mDrawPathsHistory.clear();
         invalidate();
-    }
-
-    public void setBrushSizeOldTablet(float brushSizeOldTablet){
-        //update size for old tablet
-        mBrushSizeOldTablet = brushSizeOldTablet;
-    }
-
-    public void setOldTabletMode(boolean oldTabletMode) {
-        mOldTabletMode = oldTabletMode;
     }
 
     public void undo() {

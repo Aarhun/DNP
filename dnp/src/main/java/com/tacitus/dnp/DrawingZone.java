@@ -7,6 +7,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -42,6 +43,7 @@ public class DrawingZone extends Activity implements View.OnClickListener {
     private Button mNextButton;
     private TextView mTitle;
     private ArrayList<Step> mSteps;
+    private int mMultiplier;
 
 
     @Override
@@ -80,6 +82,9 @@ public class DrawingZone extends Activity implements View.OnClickListener {
         mTitle = (TextView) findViewById(R.id.title);
         mTitle.setTextColor(getResources().getColor(android.R.color.white));
         updateTitle();
+
+        SharedPreferences settings = getSharedPreferences(Dnp.CONFIG_FILE, Context.MODE_PRIVATE);
+        mMultiplier = settings.getInt(Dnp.MULTIPLIER_NAME, getResources().getInteger(R.integer.base_stroke_size_multiplier));
 
     }
 
@@ -302,5 +307,9 @@ public class DrawingZone extends Activity implements View.OnClickListener {
     private void updateTitle() {
         int currentStep = mDrawView.getCurrentStepCursor() + 1;
         mTitle.setText(getResources().getString(R.string.step_title) + " " + currentStep);
+    }
+
+    public int getMultiplier() {
+        return mMultiplier;
     }
 }
