@@ -89,6 +89,12 @@ public class DrawingView extends View {
             drawingStep.setStep(steps.get(i));
             mStepsHistory.put(i, drawingStep);
         }
+        DrawingStep currentDrawingStep = mStepsHistory.get(mCurrentStepCursor);
+        if (currentDrawingStep != null && currentDrawingStep.getStep().getSound().getConsonant() == Sound.Consonant.D){
+            mDrawWatcher = new DrawWatcherD();
+        } else {
+            mDrawWatcher = null;
+        }
     }
 
 
@@ -223,13 +229,6 @@ public class DrawingView extends View {
         mDrawCanvas.drawColor(0, PorterDuff.Mode.CLEAR);
         mDrawPathsHistory.clear();
         invalidate();
-        DrawingStep currentDrawingStep = mStepsHistory.get(mCurrentStepCursor);
-        if (currentDrawingStep != null && currentDrawingStep.getStep().getSound().getConsonant() == Sound.Consonant.D){
-            mDrawWatcher = new DrawWatcherD();
-        } else {
-            mDrawWatcher = null;
-        }
-
     }
 
     public void nextStep(){
