@@ -254,7 +254,7 @@ public class ScenarioChooser extends Activity {
     }
 
     public void addNextItem() {
-        Step step = new Step(String.valueOf(mContentView.getChildCount()));
+        Step step = new Step();
         mDataSet.add(step);
         mAdapter.notifyItemInserted(mAdapter.getItemCount());
     }

@@ -33,7 +33,7 @@ public class Step implements Parcelable {
 
     public Step(String text) {
         mTitle = "";
-        mSound = new Sound();
+        mSound = new Sound(text);
         mLinkedDown = false;
         mLinkedUp = false;
     }

@@ -48,8 +48,9 @@ public class SizerDialog extends Dialog implements View.OnClickListener {
         mNegativeButton.setOnClickListener(this);
         // !!! Set the initial value BEFORE setting the listener !!!
         // (Avoid attempting to draw the circle)
-        mSizeChooser.setProgress(context.getResources().getInteger(R.integer.base_stroke_size_multiplier));
-        mSizerView.setMultiplier(context.getResources().getInteger(R.integer.base_stroke_size_multiplier));
+        SharedPreferences settings = getContext().getSharedPreferences(Dnp.CONFIG_FILE, Context.MODE_PRIVATE);
+        mSizeChooser.setProgress(settings.getInt(Dnp.MULTIPLIER_NAME, getContext().getResources().getInteger(R.integer.base_stroke_size_multiplier)) );
+        mSizerView.setMultiplier(settings.getInt(Dnp.MULTIPLIER_NAME, getContext().getResources().getInteger(R.integer.base_stroke_size_multiplier)));
 
         mSizeChooser.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -72,8 +73,6 @@ public class SizerDialog extends Dialog implements View.OnClickListener {
         TextView instructions = (TextView) findViewById(R.id.instructions);
         instructions.setText(context.getResources().getText(R.string.sizer_instructions));
         setCanceledOnTouchOutside(false);
-
-
     }
 
     @Override
@@ -90,11 +89,10 @@ public class SizerDialog extends Dialog implements View.OnClickListener {
 
     }
 
-
     @Override
     public void show() {
         super.show();
-        // Used to set height of color indicator dynamically
+        // Used to set height and width dynamically
 
         DisplayMetrics metrics = new DisplayMetrics();
         getWindow().getWindowManager().getDefaultDisplay().getMetrics(metrics);

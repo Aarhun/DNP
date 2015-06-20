@@ -3,11 +3,8 @@ package com.tacitus.dnp.widget;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Path;
 import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
 import android.support.v4.view.MotionEventCompat;
 import android.util.AttributeSet;
 import android.util.SparseArray;
@@ -19,6 +16,10 @@ import android.widget.Toast;
 import com.tacitus.dnp.DrawingZone;
 import com.tacitus.dnp.R;
 import com.tacitus.dnp.Util;
+import com.tacitus.dnp.drawingtools.DrawPath;
+import com.tacitus.dnp.drawingtools.DrawWatcher;
+import com.tacitus.dnp.drawingtools.DrawWatcherD;
+import com.tacitus.dnp.scenario.Sound;
 import com.tacitus.dnp.scenario.Step;
 
 import junit.framework.Assert;
@@ -51,73 +52,16 @@ public class DrawingView extends View {
 
     }
 
-    private class DrawPath {
-        private Path mDrawPath;
-        private Paint mDrawPaint;
-        private Paint mDrawPaintHollow;
-        private float mSize;
-        private float mSizeHollow;
-
-        private DrawPath(float size, float pressure, Step step) {
-            mDrawPath = new Path();
-            mDrawPaint = createPaint();
-            mDrawPaint.setColor(step.getLine().getColor());
-            mSize = size;
-            // Create Hollow paint only if eraseMode is not enable
-            if (step.getLine().isHollow()) {
-                mSizeHollow = mSize - (mSize * HOLLOW_LINE_THICKNESS_RATIO / 100);
-                mDrawPaintHollow = createPaint();
-                mDrawPaintHollow.setStrokeWidth(mSizeHollow);
-                mDrawPaintHollow.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-            }
-            mDrawPaint.setStrokeWidth(mSize);
-            if (step.getLine().isUnderline()) {
-                mDrawPaint.setShadowLayer(1f, mSize / 2, mSize / 2, Color.BLACK);
-            }
-            // WARNING: When changing color needs to define alpha AFTER
-            // Because color contains some alpha setting.
-            mDrawPaint.setAlpha(getResources().getInteger(R.integer.initial_alpha));
-        }
-
-
-
-        public void moveTo(float x, float y) {
-            mDrawPath.moveTo(x, y);
-        }
-
-        public void lineTo(float x, float y) {
-            mDrawPath.lineTo(x, y);
-        }
-
-        public void drawPath() {
-            mDrawCanvas.drawPath(mDrawPath, mDrawPaint);
-            if (mDrawPaintHollow != null) {
-                mDrawCanvas.drawPath(mDrawPath, mDrawPaintHollow);
-            }
-        }
-
-        public void drawPath(Canvas canvas) {
-            canvas.drawPath(mDrawPath, mDrawPaint);
-            if (mDrawPaintHollow != null) {
-                canvas.drawPath(mDrawPath, mDrawPaintHollow);
-            }
-        }
-
-        public void resetPath() {
-            mDrawPath.reset();
-        }
-
-    }
-
     //drawing path & paint
     private SparseArray<DrawPath> mDrawPaths = new SparseArray<DrawPath>();
     private ArrayList<DrawPath> mDrawPathsHistory = new ArrayList<DrawPath>();
     private SparseArray<DrawingStep> mStepsHistory = new SparseArray<DrawingStep>();
     private ArrayList<DrawPath> mDrawPathsRedoable = new ArrayList<DrawPath>();
 
+    private DrawWatcher mDrawWatcher;
     private int mCurrentStepCursor = 0;
 
-    private final int HOLLOW_LINE_THICKNESS_RATIO = 20;
+    public static final int HOLLOW_LINE_THICKNESS_RATIO = 20;
 
     private Paint mCanvasPaint;
     //canvas
@@ -131,10 +75,12 @@ public class DrawingView extends View {
     private Toast mNoColorSelected;
     private Context mContext;
 
+
     public DrawingView(Context context, AttributeSet attrs){
         super(context, attrs);
         mCanvasPaint = new Paint(Paint.DITHER_FLAG);
         mContext = context;
+        mDrawWatcher = null;
     }
 
     public void setScenario(ArrayList<Step> steps) {
@@ -146,7 +92,7 @@ public class DrawingView extends View {
     }
 
 
-    private Paint createPaint() {
+    public static Paint createPaint() {
         Paint paint = new Paint();
         paint.setAntiAlias(true);
         paint.setStyle(Paint.Style.STROKE);
@@ -165,6 +111,7 @@ public class DrawingView extends View {
         }
         mCanvasBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         mDrawCanvas = new Canvas(mCanvasBitmap);
+        startNew();
     }
 
 
@@ -175,7 +122,7 @@ public class DrawingView extends View {
         // Temporary drawing current drawn paths on hardware canvas
         for (int i=0; i<mDrawPaths.size(); i++) {
             DrawPath drawPath = mDrawPaths.valueAt(i);
-            drawPath.drawPath(canvas);
+            drawPath.draw(canvas);
         }
 
 
@@ -204,6 +151,7 @@ public class DrawingView extends View {
         float multiplier = ((DrawingZone)mContext).getMultiplier();
         float size = event.getPressure(index) * multiplier;
         float pressure = event.getPressure(index);
+        DrawingStep drawingStep = mStepsHistory.get(mCurrentStepCursor);
         DrawPath drawPath;
 
         switch (MotionEventCompat.getActionMasked(event)) {
@@ -212,9 +160,8 @@ public class DrawingView extends View {
 //                Log.logEvent(event);
 
                 // Create path and draw a small line of 1 pixel:
-                DrawingStep drawingStep = mStepsHistory.get(mCurrentStepCursor);
                 if (drawingStep != null) {
-                    drawPath = new DrawPath(size, pressure, mStepsHistory.get(mCurrentStepCursor).getStep());
+                    drawPath = new DrawPath(size, getResources().getInteger(R.integer.initial_alpha), mStepsHistory.get(mCurrentStepCursor).getStep());
                     drawPath.moveTo(touchX, touchY);
                     drawPath.lineTo(touchX - 1, touchY - 1);
                     mDrawPaths.put(id, drawPath);
@@ -248,12 +195,15 @@ public class DrawingView extends View {
                 if (drawPath != null) {
                     drawPath.lineTo(touchX, touchY);
                     // Draw path definitely on bitmap:
-                    drawPath.drawPath();
+                    drawPath.draw(mDrawCanvas);
                     mDrawPathsHistory.add(drawPath);
                     mDrawPathsRedoable.clear();
                     mDrawPaths.remove(id);
                     // This will call the onDraw callback to draw the bitmap on hardware canvas:
                     invalidate();
+                    if (mDrawPaths.size() == 0 && mDrawWatcher != null){
+                        mDrawWatcher.draw(mDrawCanvas, mDrawPathsHistory, mStepsHistory.get(mCurrentStepCursor).getStep());
+                    }
                 }
                 break;
 
@@ -273,6 +223,13 @@ public class DrawingView extends View {
         mDrawCanvas.drawColor(0, PorterDuff.Mode.CLEAR);
         mDrawPathsHistory.clear();
         invalidate();
+        DrawingStep currentDrawingStep = mStepsHistory.get(mCurrentStepCursor);
+        if (currentDrawingStep != null && currentDrawingStep.getStep().getSound().getConsonant() == Sound.Consonant.D){
+            mDrawWatcher = new DrawWatcherD();
+        } else {
+            mDrawWatcher = null;
+        }
+
     }
 
     public void nextStep(){
@@ -319,6 +276,7 @@ public class DrawingView extends View {
     private void startStep() {
         // Reset canvas:
         mDrawCanvas.drawColor(0, PorterDuff.Mode.CLEAR);
+
         // Draw paths of linked previous steps:
         drawPreviousSteps();
         // Get current saved paths history:
@@ -327,6 +285,11 @@ public class DrawingView extends View {
         redrawAllPaths();
         mDrawPathsRedoable.clear();
         invalidate();
+        if (mStepsHistory.get(mCurrentStepCursor).getStep().getSound().getConsonant() == Sound.Consonant.D){
+            mDrawWatcher = new DrawWatcherD();
+        } else {
+            mDrawWatcher = null;
+        }
     }
 
     public void loadImage(Bitmap bitmap) {
@@ -358,7 +321,7 @@ public class DrawingView extends View {
             DrawPath lastPath = mDrawPathsRedoable.get(mDrawPathsRedoable.size() - 1);
             mDrawPathsRedoable.remove(lastPath);
             mDrawPathsHistory.add(lastPath);
-            lastPath.drawPath();
+            lastPath.draw(mDrawCanvas);
             invalidate();
         } else {
             mNothingToRedo = Util.showToast(getContext(), mNothingToRedo, R.string.nothing_to_redo);
@@ -368,13 +331,13 @@ public class DrawingView extends View {
 
     private void redrawAllPaths() {
         for (int i=0; i<mDrawPathsHistory.size(); ++i) {
-            mDrawPathsHistory.get(i).drawPath();
+            mDrawPathsHistory.get(i).draw(mDrawCanvas);
         }
     }
 
     private void redrawAllPaths(ArrayList<DrawPath> paths) {
         for (int i=0; i<paths.size(); ++i) {
-            paths.get(i).drawPath();
+            paths.get(i).draw(mDrawCanvas);
         }
     }
 
